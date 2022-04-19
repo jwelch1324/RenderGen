@@ -2,6 +2,8 @@
 #define DRAW_H_
 #include "tgaimage.h"
 #include "geometry.h"
+#include <math.h>
+#include <algorithm>
 namespace draw
 {
     auto white = TGAColor(255, 255, 255, 255);
@@ -153,7 +155,17 @@ namespace draw
         bbox_out[3] = std::max(std::max(A.y, B.y), C.y);
     }
 
-    Vec3f barycentric(Vec2i *points, Vec2i P)
+    inline void triangleBoundingBox3D(Vec3f &A, Vec3f &B, Vec3f &C, int *bbox_out, Vec2f clamp)
+    {
+        // Bbox will be in the form [minx, miny, maxx, maxy]
+        bbox_out[0] = std::max(0.f, std::min(std::min(A.x, B.x), C.x));
+        bbox_out[1] = std::max(0.f, std::min(std::min(A.y, B.y), C.y));
+        bbox_out[2] = std::min(clamp.x, std::max(std::max(A.x, B.x), C.x));
+        bbox_out[3] = std::min(clamp.y, std::max(std::max(A.y, B.y), C.y));
+    }
+
+    template <class VT>
+    Vec3f barycentric(VT *points, Vec2i P)
     {
         // Get the cross product X^Y from the barycentric decomposition
         Vec3f u = Vec3f(points[2].x - points[0].x, points[1].x - points[0].x, points[0].x - P.x) ^ Vec3f(points[2].y - points[0].y, points[1].y - points[0].y, points[0].y - P.y);
@@ -165,7 +177,19 @@ namespace draw
         return Vec3f(1.f - (u.x + u.y) / u.z, u.x / u.z, u.y / u.z);
     }
 
-    void triangle(Vec2i A, Vec2i B, Vec2i C, TGAImage &image, TGAColor &color)
+    Vec3f barycentricf(Vec3f *points, Vec2f P)
+    {
+        // Get the cross product X^Y from the barycentric decomposition
+        Vec3f u = Vec3f(points[2].x - points[0].x, points[1].x - points[0].x, points[0].x - P.x) ^ Vec3f(points[2].y - points[0].y, points[1].y - points[0].y, points[0].y - P.y);
+        // If abs(u.z) < 1, then u.z < 0 -- return negative coordinate vector
+        if (std::abs(u.z) < 1)
+            return Vec3f(-1, 1, 1);
+
+        // Otherwise we can calculate the barycentric coordinate vector [u v 1]
+        return Vec3f(1.f - (u.x + u.y) / u.z, u.x / u.z, u.y / u.z);
+    }
+
+    void trianglestd(Vec2i A, Vec2i B, Vec2i C, TGAImage &image, TGAColor &color)
     {
         // Sort by Y coordinate -- Not sure if this is still needed here...
         std::vector<Vec2i> points{A, B, C};
@@ -175,6 +199,8 @@ namespace draw
         A = points[0];
         B = points[1];
         C = points[2];
+
+        auto width = image.width();
 
         // We are going to scan the bounding box of the triangle so we need a way to find the bounding box...
         int bbox[4];
@@ -198,6 +224,47 @@ namespace draw
             }
         }
     }
-}
 
+    void triangle(Vec3f A, Vec3f B, Vec3f C, float *zbuffer, TGAImage &image, TGAColor &color)
+    {
+        // Sort by Y coordinate -- Not sure if this is still needed here...
+        std::vector<Vec3f> points{A, B, C};
+        // std::sort(points.begin(), points.end(),
+        //           [](Vec3f a, Vec3f b)
+        //           { return a.y < b.y; });
+        A = points[0];
+        B = points[1];
+        C = points[2];
+
+        auto width = image.width();
+
+        // We are going to scan the bounding box of the triangle so we need a way to find the bounding box...
+        int bbox[4];
+        memset(bbox, 0, 4);
+        triangleBoundingBox3D(A, B, C, bbox, Vec2f(image.width() - 1, image.height() - 1));
+
+        // Scanning each point in the bounding box
+        for (int xc = bbox[0]; xc <= bbox[2]; xc++)
+        {
+            for (int yc = bbox[1]; yc <= bbox[3]; yc++)
+            {
+                // create a vec2i for the target point
+                Vec2f P(xc, yc);
+                auto bc_mask = barycentricf(points.data(), P);
+
+                // If the point doesn't fall within the triangle don't render
+                if (bc_mask.x < 0 || bc_mask.y < 0 || bc_mask.z < 0)
+                    continue;
+
+                // Now to determine if we draw this triangle we need to figure out if its z coordinate is acceptable.
+                float zcoord = A.z * bc_mask.x + B.z * bc_mask.y + C.z * bc_mask.z;
+                if (zbuffer[xc + yc * width] < zcoord)
+                {
+                    zbuffer[xc + yc * width] = zcoord;
+                    image.set(xc, yc, color);
+                }
+            }
+        }
+    }
+}
 #endif

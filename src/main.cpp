@@ -37,9 +37,9 @@ int main2(int, char **)
     image.write_tga_file("triangle2.tga");
 
     image = TGAImage(width, height, TGAImage::RGB);
-    draw::triangle(t0[0], t0[1], t0[2], image, red);
-    draw::triangle(t1[0], t1[1], t1[2], image, white);
-    draw::triangle(t2[0], t2[1], t2[2], image, green);
+    draw::trianglestd(t0[0], t0[1], t0[2], image, red);
+    draw::trianglestd(t1[0], t1[1], t1[2], image, white);
+    draw::trianglestd(t2[0], t2[1], t2[2], image, green);
     image.write_tga_file("triangle3.tga");
 
     return 0;
@@ -55,8 +55,8 @@ void renderHeadFlatFast()
 
     for (auto i = 0; i < model.nfaces(); i++)
     {
-        printf("\r%d : %d", i, model.nfaces());
-        // Get the face we are going to draw the wireframe for
+        // printf("\r%d : %d", i, model.nfaces());
+        //  Get the face we are going to draw the wireframe for
         auto face = model.face(i);
 
         // Face definition format -- first number in each group is a vertex making up the triangle.
@@ -71,7 +71,7 @@ void renderHeadFlatFast()
         }
 
         auto cc = TGAColor(rand() % 255, rand() % 255, rand() % 255, 255);
-        draw::triangle(t[0], t[1], t[2], image, cc);
+        draw::trianglestd(t[0], t[1], t[2], image, cc);
     }
 
     image.write_tga_file("render.tga");
@@ -83,6 +83,10 @@ void renderHeadShaded()
     auto height = 1000;
     Vec3f lightVec(0, 0, -1);
     TGAImage image(width, height, TGAImage::RGB);
+    float *zbuffer = new float[height * width];
+    for(int i = 0; i< height*width; i++) {
+        zbuffer[i] = -std::numeric_limits<float>::max();
+    }
 
     auto model = Model("african_head.obj");
 
@@ -95,12 +99,13 @@ void renderHeadShaded()
         // Face definition format -- first number in each group is a vertex making up the triangle.
         // f 1193/1240/1193 1180/1227/1180 1179/1226/1179
         // Now we loop through the vertices in each face and draw the lines connecting all the vertices (which are in x,y,z format)
-        Vec2i t[3];
+        Vec3f t[3];
         for (int j = 0; j < 3; j++)
         {
             auto v0 = model.vert(face[j]);
             t[j].x = (v0.x + 1) * width / 2.;
             t[j].y = (v0.y + 1) * height / 2.;
+            t[j].z = (v0.z);
         }
 
         // Get the normal to the triangle
@@ -109,11 +114,11 @@ void renderHeadShaded()
 
         // Get light intensity as scalar product of light vector with normal
         auto ivec = zz * lightVec;
-        printf("%f\n", ivec * 255);
+        // printf("%f\n", ivec * 255);
         if (ivec > 0)
         {
             auto cc = TGAColor(ivec * 255, ivec * 255, ivec * 255, 255);
-            draw::triangle(t[0], t[1], t[2], image, cc);
+            draw::triangle(t[0], t[1], t[2], zbuffer, image, cc);
         }
     }
 
@@ -147,8 +152,6 @@ void renderHeadFlatSweep()
 
         draw::trianglesweep(t[0], t[1], t[2], image, colors[i % 3]);
     }
-    printf("\n");
-
     // image.write_tga_file("render.tga");
 }
 
@@ -185,6 +188,58 @@ void renderHeadWireframe(int, char **)
     // image.write_tga_file("output.tga");
 }
 
+void renderHeadTextured()
+{
+    auto width = 1000;
+    auto height = 1000;
+    Vec3f lightVec(0, 0, -1);
+    TGAImage image(width, height, TGAImage::RGB);
+    
+    TGAImage tex = TGAImage();
+    tex.read_tga_file("african_head_diffuse.tga");
+
+    float *zbuffer = new float[height * width];
+    for(int i = 0; i< height*width; i++) {
+        zbuffer[i] = -std::numeric_limits<float>::max();
+    }
+
+    auto model = Model("african_head.obj");
+
+    for (auto i = 0; i < model.nfaces(); i++)
+    {
+        //  printf("\r%d : %d", i, model.nfaces());
+        // Get the face we are going to draw the wireframe for
+        auto face = model.face(i);
+        // Face definition format -- first number in each group is a vertex making up the triangle.
+        // f 1193/1240/1193 1180/1227/1180 1179/1226/1179
+        // Now we loop through the vertices in each face and draw the lines connecting all the vertices (which are in x,y,z format)
+        Vec3f t[3];
+        for (int j = 0; j < 3; j++)
+        {
+            auto v0 = model.vert(face[j]);
+            t[j].x = (v0.x + 1) * width / 2.;
+            t[j].y = (v0.y + 1) * height / 2.;
+            t[j].z = (v0.z);
+        }
+
+        // Get the normal to the triangle
+        auto zz = (model.vert(face[2]) - model.vert(face[0])) ^ (model.vert(face[1]) - model.vert(face[0]));
+        zz.normalize();
+
+        // Get light intensity as scalar product of light vector with normal
+        auto ivec = zz * lightVec;
+        // printf("%f\n", ivec * 255);
+        if (ivec > 0)
+        {
+            auto cc = TGAColor(ivec * 255, ivec * 255, ivec * 255, 255);
+            draw::triangle(t[0], t[1], t[2], zbuffer, image, cc);
+        }
+    }
+
+    image.write_tga_file("renderShadedTexture.tga");
+}
+
+
 int main(int argc, char **argv)
 {
     // //main2(argc, argv);
@@ -194,7 +249,7 @@ int main(int argc, char **argv)
     // printf("Took %lld microseconds for Sweep Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
 
     auto s = std::chrono::high_resolution_clock::now();
-    renderHeadShaded();
+    renderHeadTextured();
     auto e = std::chrono::high_resolution_clock::now();
     printf("Took %lld microseconds for Fast Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
 }
