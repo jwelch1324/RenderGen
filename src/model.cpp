@@ -44,7 +44,7 @@ Model::Model(const char *filename) : verts_(), faces_()
         }
         else if (!line.compare(0, 2, "vt"))
         {
-            iss >> trash;
+            iss >> trash >> trash;
             Vec3f vt;
             for (int i = 0; i < 3; i++)
             {
