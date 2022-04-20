@@ -10,7 +10,7 @@ include(CTest)
 enable_testing()
 
 link_directories("/usr/local/lib")
-add_executable(tinyrenderer src/main.cpp src/tgaimage.cpp src/model.cpp)
+add_executable(tinyrenderer src/main.cpp src/tgaimage.cpp src/model.cpp src/geometry.cpp)
 target_include_directories(tinyrenderer PRIVATE include)
 #target_link_libraries(tinyrenderer profiler)
 

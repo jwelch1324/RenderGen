@@ -193,7 +193,7 @@ namespace draw
             return Vec3f(-1, 1, 1);
 
         // Otherwise we can calculate the barycentric coordinate vector [u v 1]
-        return Vec3f(1.f - (u.x + u.y) / u.z, u.x / u.z, u.y / u.z);
+        return Vec3f(1.f - (u.x + u.y) / u.z, u.y / u.z, u.x / u.z);
     }
 
     void trianglestd(Vec2i A, Vec2i B, Vec2i C, TGAImage &image, TGAColor &color)
@@ -232,7 +232,7 @@ namespace draw
         }
     }
 
-    void texturedTriangle(Triangle tri, float *zbuffer, TGAImage &image)
+    void texturedTriangle(Triangle tri, float *zbuffer, TGAImage &image, TGAImage &texture, float ivec = 1.0)
     {
         auto A = tri._verts[0];
         auto B = tri._verts[1];
@@ -259,14 +259,19 @@ namespace draw
 
                 // Now to determine if we draw this triangle we need to figure out if its z coordinate is acceptable.
                 float zcoord = A.z * bc_mask.x + B.z * bc_mask.y + C.z * bc_mask.z;
-                float redInterp = tri._tverts[0].x * bc_mask.x + tri._tverts[1].x * bc_mask.y + tri._tverts[1].x + bc_mask.z;
-                float greenInterp = tri._tverts[0].y * bc_mask.x + tri._tverts[1].y * bc_mask.y + tri._tverts[1].y + bc_mask.z;
-                float blueInterp = tri._tverts[0].z * bc_mask.x + tri._tverts[1].z * bc_mask.y + tri._tverts[1].z + bc_mask.z;
-                TGAColor color(redInterp*255,greenInterp*255,blueInterp*255,255);
-                //TGAColor color(255, 255, 255, 255);
                 if (zbuffer[xc + yc * width] < zcoord)
                 {
                     zbuffer[xc + yc * width] = zcoord;
+
+                    // We need to interpolate the u,v coordinates in the texture map to get the color of this vertex.
+                    float u = tri._tverts[0].x * bc_mask.x + tri._tverts[1].x * bc_mask.y + tri._tverts[2].x * bc_mask.z;
+                    float v = tri._tverts[0].y * bc_mask.x + tri._tverts[1].y * bc_mask.y + tri._tverts[2].y * bc_mask.z;
+                    TGAColor color = texture.get(u, v);
+                    for (int l = 0; l < 3; l++)
+                    {
+                        color.bgra[l] = uint8_t(float(color.bgra[l]) * ivec);
+                    }
+
                     image.set(xc, yc, color);
                 }
             }
@@ -313,6 +318,105 @@ namespace draw
                 }
             }
         }
+    }
+    const int depth = 255;
+    Matrix viewport(int x, int y, int w, int h)
+    {
+        Matrix m = Matrix::identity(4);
+        m[0][3] = x + w / 2.f;
+        m[1][3] = y + h / 2.f;
+        m[2][3] = depth / 2.f;
+
+        m[0][0] = w / 2.f;
+        m[1][1] = h / 2.f;
+        m[2][2] = depth / 2.f;
+        return m;
+    }
+
+    void renderHeadTexturedProjective()
+    {
+        auto width = 1000;
+        auto height = 1000;
+        Vec3f lightVec(0, 0, -1);
+        TGAImage image(width, height, TGAImage::RGB);
+
+        TGAImage tex = TGAImage();
+        tex.read_tga_file("african_head_diffuse.tga");
+        tex.flip_vertically();
+
+        auto twidth = tex.width();
+        auto theight = tex.height();
+
+        float *zbuffer = new float[height * width];
+        for (int i = 0; i < height * width; i++)
+        {
+            zbuffer[i] = -std::numeric_limits<float>::max();
+        }
+
+        auto model = Model("african_head.obj");
+
+        Matrix proj(4, 4);
+        proj[0][0] = 1;
+        proj[1][1] = 1;
+        proj[2][2] = 1;
+        proj[3][2] = -1.f / 2;
+        proj[3][3] = 1;
+
+        // Matrix proj = Matrix::identity(4);
+        // proj[3][2] = -1.f/3.0f;
+
+        Matrix vp = viewport(image.width()/8, image.height()/8, image.width() * 3 / 4, image.height() * 3 / 4);
+
+        for (int i = 0; i < model.nfaces(); i++)
+        {
+            //  printf("\r%d : %d", i, model.nfaces());
+            // Get the face we are going to draw the wireframe for
+            Face face = model.face(i);
+            // Face definition format -- first number in each group is a vertex making up the triangle.
+            // f 1193/1240/1193 1180/1227/1180 1179/1226/1179
+            // Now we loop through the vertices in each face and draw the lines connecting all the vertices (which are in x,y,z format)
+            Vec3f t[3];
+            Triangle tri = draw::Triangle();
+            for (int j = 0; j < 3; j++)
+            {
+                Vec3f v0 = model.vert(face.vertIdx_[j]);
+                // Vec3f vtmp = Vec3f();
+                // vtmp.x = (v0.x + 1) * width / 2.;
+                // vtmp.y = (v0.y + 1) * height / 2.;
+                // vtmp.z = (v0.z);
+
+                Vec3f xx = v0;
+                Matrix tmp(4, 1);
+                tmp[0][0] = xx.x;
+                tmp[1][0] = xx.y;
+                tmp[2][0] = xx.z;
+                tmp[3][0] = 1;
+
+                Matrix res =  vp*proj *tmp;
+                float zz = res[3][0];
+                Vec3f newpoint(res[0][0] / zz, res[1][0] / zz, res[2][0] / zz);
+                printf("%f,%f,%f\n",newpoint.x,newpoint.y,newpoint.z);
+                tri._verts.push_back(newpoint);
+
+                Vec3f texVerts = model.tvert(face.tvertIdx_[j]);
+                tri._tverts.push_back(Vec3f(texVerts.x * twidth, texVerts.y * theight, 0));
+            }
+
+            // Get the normal to the triangle
+            Vec3f zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^ (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
+            zz.normalize();
+
+            // Get light intensity as scalar product of light vector with normal
+            auto ivec = zz * lightVec;
+            // printf("%f\n", ivec * 255);
+
+            if (ivec > 0)
+            {
+                draw::texturedTriangle(tri, zbuffer, image, tex, ivec);
+            }
+        }
+
+        image.write_tga_file("renderShadedTextureProjective.tga");
     }
 }
 #endif

@@ -197,6 +197,7 @@ void renderHeadTextured()
 
     TGAImage tex = TGAImage();
     tex.read_tga_file("african_head_diffuse.tga");
+    tex.flip_vertically();
 
     auto twidth = tex.width();
     auto theight = tex.height();
@@ -227,9 +228,7 @@ void renderHeadTextured()
             tri._verts[j].z = (v0.z);
 
             auto texVerts = model.tvert(face.tvertIdx_[j]);
-            TGAColor vColor = tex.get(texVerts.x * twidth, texVerts.y*theight);
-
-            tri._tverts.push_back(Vec3f(vColor.bgra[2],vColor.bgra[1],vColor[0]));
+            tri._tverts.push_back(Vec3f(texVerts.x*twidth, texVerts.y*theight,0));
         }
 
 
@@ -248,7 +247,7 @@ void renderHeadTextured()
         {
             auto cc = TGAColor(ivec * 255, ivec * 255, ivec * 255, 255);
             //draw::triangle(t[0], t[1], t[2], zbuffer, image, cc);
-            draw::texturedTriangle(tri,zbuffer,image);
+            draw::texturedTriangle(tri,zbuffer,image,tex, ivec);
         }
     }
 
@@ -265,7 +264,7 @@ int main(int argc, char **argv)
     // printf("Took %lld microseconds for Sweep Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
 
     auto s = std::chrono::high_resolution_clock::now();
-    renderHeadTextured();
+    draw::renderHeadTexturedProjective();
     auto e = std::chrono::high_resolution_clock::now();
     printf("Took %lld microseconds for Fast Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
 }
