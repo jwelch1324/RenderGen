@@ -30,20 +30,24 @@ Model::Model(const char *filename) : verts_(), faces_()
         }
         else if (!line.compare(0, 2, "f "))
         {
-            std::vector<int> f;
-            int itrash, idx;
+            Face f;
+            int itrash, idx, vtidx;
             iss >> trash;
-            while (iss >> idx >> trash >> itrash >> trash >> itrash)
+            while (iss >> idx >> trash >> vtidx >> trash >> itrash)
             {
                 idx--; // in wavefront obj all indices start at 1, not zero
-                f.push_back(idx);
+                vtidx--;
+                f.vertIdx_.push_back(idx);
+                f.tvertIdx_.push_back(vtidx);
             }
             faces_.push_back(f);
         }
-        else if (!line.compare(0,2,"vt")){
+        else if (!line.compare(0, 2, "vt"))
+        {
             iss >> trash;
             Vec3f vt;
-            for (int i = 0; i < 3; i++){
+            for (int i = 0; i < 3; i++)
+            {
                 iss >> vt.raw[i];
             }
 
@@ -72,7 +76,7 @@ int Model::ntverts()
     return (int)tverts_.size();
 }
 
-std::vector<int> Model::face(int idx)
+Face &Model::face(int idx)
 {
     return faces_[idx];
 }

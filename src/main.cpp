@@ -65,7 +65,7 @@ void renderHeadFlatFast()
         Vec2i t[3];
         for (int j = 0; j < 3; j++)
         {
-            auto v0 = model.vert(face[j]);
+            auto v0 = model.vert(face.vertIdx_[j]);
             t[j].x = (v0.x + 1) * width / 2.;
             t[j].y = (v0.y + 1) * height / 2.;
         }
@@ -102,14 +102,14 @@ void renderHeadShaded()
         Vec3f t[3];
         for (int j = 0; j < 3; j++)
         {
-            auto v0 = model.vert(face[j]);
+            auto v0 = model.vert(face.vertIdx_[j]);
             t[j].x = (v0.x + 1) * width / 2.;
             t[j].y = (v0.y + 1) * height / 2.;
             t[j].z = (v0.z);
         }
 
         // Get the normal to the triangle
-        auto zz = (model.vert(face[2]) - model.vert(face[0])) ^ (model.vert(face[1]) - model.vert(face[0]));
+        auto zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^ (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
         zz.normalize();
 
         // Get light intensity as scalar product of light vector with normal
@@ -145,7 +145,7 @@ void renderHeadFlatSweep()
         Vec2i t[3];
         for (int j = 0; j < 3; j++)
         {
-            auto v0 = model.vert(face[j]);
+            auto v0 = model.vert(face.vertIdx_[j]);
             t[j].x = (v0.x + 1) * width / 2.;
             t[j].y = (v0.y + 1) * height / 2.;
         }
@@ -174,8 +174,8 @@ void renderHeadWireframe(int, char **)
         // Now we loop through the vertices in each face and draw the lines connecting all the vertices (which are in x,y,z format)
         for (auto j = 0; j < 3; j++)
         {
-            auto v0 = model.vert(face[j]);
-            auto v1 = model.vert(face[(j + 1) % 3]); // We take mod 3 to always pick a vertex we haven't connected to yet so v0 @j=0 ==> v1 @(j+1)%3=1; v0 @j=2 ==> v1 @(j+2)%3 = 0
+            auto v0 = model.vert(face.vertIdx_[j]);
+            auto v1 = model.vert(face.vertIdx_[(j + 1) % 3]); // We take mod 3 to always pick a vertex we haven't connected to yet so v0 @j=0 ==> v1 @(j+1)%3=1; v0 @j=2 ==> v1 @(j+2)%3 = 0
             int x0 = (v0.x + 1) * width / 2.;
             int y0 = (v0.y + 1) * height / 2.;
             int x1 = (v1.x + 1) * width / 2.;
@@ -194,9 +194,12 @@ void renderHeadTextured()
     auto height = 1000;
     Vec3f lightVec(0, 0, -1);
     TGAImage image(width, height, TGAImage::RGB);
-    
+
     TGAImage tex = TGAImage();
     tex.read_tga_file("african_head_diffuse.tga");
+
+    auto twidth = tex.width();
+    auto theight = tex.height();
 
     float *zbuffer = new float[height * width];
     for(int i = 0; i< height*width; i++) {
@@ -214,25 +217,38 @@ void renderHeadTextured()
         // f 1193/1240/1193 1180/1227/1180 1179/1226/1179
         // Now we loop through the vertices in each face and draw the lines connecting all the vertices (which are in x,y,z format)
         Vec3f t[3];
+        auto tri = draw::Triangle();
         for (int j = 0; j < 3; j++)
         {
-            auto v0 = model.vert(face[j]);
-            t[j].x = (v0.x + 1) * width / 2.;
-            t[j].y = (v0.y + 1) * height / 2.;
-            t[j].z = (v0.z);
+            auto v0 = model.vert(face.vertIdx_[j]);
+            tri._verts.push_back(Vec3f());
+            tri._verts[j].x = (v0.x + 1) * width / 2.;
+            tri._verts[j].y = (v0.y + 1) * height / 2.;
+            tri._verts[j].z = (v0.z);
+
+            auto texVerts = model.tvert(face.tvertIdx_[j]);
+            TGAColor vColor = tex.get(texVerts.x * twidth, texVerts.y*theight);
+
+            tri._tverts.push_back(Vec3f(vColor.bgra[2],vColor.bgra[1],vColor[0]));
         }
 
+
+
+
         // Get the normal to the triangle
-        auto zz = (model.vert(face[2]) - model.vert(face[0])) ^ (model.vert(face[1]) - model.vert(face[0]));
+        auto zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^ (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
         zz.normalize();
 
         // Get light intensity as scalar product of light vector with normal
         auto ivec = zz * lightVec;
         // printf("%f\n", ivec * 255);
+
+
         if (ivec > 0)
         {
             auto cc = TGAColor(ivec * 255, ivec * 255, ivec * 255, 255);
-            draw::triangle(t[0], t[1], t[2], zbuffer, image, cc);
+            //draw::triangle(t[0], t[1], t[2], zbuffer, image, cc);
+            draw::texturedTriangle(tri,zbuffer,image);
         }
     }
 

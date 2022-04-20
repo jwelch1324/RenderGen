@@ -6,6 +6,13 @@
 #include <algorithm>
 namespace draw
 {
+
+    struct Triangle
+    {
+        std::vector<Vec3f> _verts;
+        std::vector<Vec3f> _tverts;
+    };
+
     auto white = TGAColor(255, 255, 255, 255);
     void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color)
     {
@@ -221,6 +228,47 @@ namespace draw
                     continue;
 
                 image.set(xc, yc, color);
+            }
+        }
+    }
+
+    void texturedTriangle(Triangle tri, float *zbuffer, TGAImage &image)
+    {
+        auto A = tri._verts[0];
+        auto B = tri._verts[1];
+        auto C = tri._verts[2];
+
+        auto width = image.width();
+        auto height = image.height();
+
+        int bbox[4];
+        triangleBoundingBox3D(A, B, C, bbox, Vec2f(width - 1, height - 1));
+
+        // Scanning each point in the bounding box
+        for (int xc = bbox[0]; xc <= bbox[2]; xc++)
+        {
+            for (int yc = bbox[1]; yc <= bbox[3]; yc++)
+            {
+                // create a vec2i for the target point
+                Vec2f P(xc, yc);
+                auto bc_mask = barycentricf(tri._verts.data(), P);
+
+                // If the point doesn't fall within the triangle don't render
+                if (bc_mask.x < 0 || bc_mask.y < 0 || bc_mask.z < 0)
+                    continue;
+
+                // Now to determine if we draw this triangle we need to figure out if its z coordinate is acceptable.
+                float zcoord = A.z * bc_mask.x + B.z * bc_mask.y + C.z * bc_mask.z;
+                float redInterp = tri._tverts[0].x * bc_mask.x + tri._tverts[1].x * bc_mask.y + tri._tverts[1].x + bc_mask.z;
+                float greenInterp = tri._tverts[0].y * bc_mask.x + tri._tverts[1].y * bc_mask.y + tri._tverts[1].y + bc_mask.z;
+                float blueInterp = tri._tverts[0].z * bc_mask.x + tri._tverts[1].z * bc_mask.y + tri._tverts[1].z + bc_mask.z;
+                TGAColor color(redInterp*255,greenInterp*255,blueInterp*255,255);
+                //TGAColor color(255, 255, 255, 255);
+                if (zbuffer[xc + yc * width] < zcoord)
+                {
+                    zbuffer[xc + yc * width] = zcoord;
+                    image.set(xc, yc, color);
+                }
             }
         }
     }
