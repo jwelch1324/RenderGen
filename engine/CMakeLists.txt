@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(tinyrenderer VERSION 0.1.0)
+project(rendergen VERSION 0.1.0)
 
 
 set(CMAKE_CXX_STANDARD 17)
@@ -16,12 +16,20 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-add_subdirectory("engine")
-
 link_directories("/usr/local/lib")
-add_executable(tinyrenderer src/main.cpp src/tgaimage.cpp src/model.cpp src/geometry.cpp)
-target_include_directories(tinyrenderer PRIVATE include)
+file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/tests *.cpp)
+add_library(rendergen ${SRC_FILES})
+target_include_directories(rendergen PRIVATE include)
 #target_link_libraries(tinyrenderer profiler)
+
+enable_testing()
+file(GLOB_RECURSE TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/tests *.cc)
+add_executable(rendergentest ${TEST_SRC_FILES})
+target_link_libraries(rendergentest gtest_main)
+target_include_directories(rendergentest PRIVATE ${PROJECT_SOURCE_DIR}/include)
+
+include(GoogleTest)
+gtest_discover_tests(rendergentest)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
