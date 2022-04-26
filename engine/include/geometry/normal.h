@@ -35,8 +35,8 @@ namespace rengen::geometry
             return (*this);
         }
 
-        Normal<T> operator*(const float f) const { return Normal<T>((T)(x * f), (T)(y * f), (T)(z * f)); }
-        Normal<T> operator*=(const float f)
+        Normal<T> operator*(const Float f) const { return Normal<T>((T)(x * f), (T)(y * f), (T)(z * f)); }
+        Normal<T> operator*=(const Float f)
         {
             x = T(x * f);
             y = T(y * f);
@@ -44,33 +44,33 @@ namespace rengen::geometry
             return (*this);
         }
 
-        Normal<T> operator/(const float f) const
+        Normal<T> operator/(const Float f) const
         {
             assert(f != 0);
-            float inv = 1.0f / f;
+            Float inv = 1.0f / f;
             return Normal<T>(x * inv, y * inv, z * inv);
         }
-        Normal<T> operator/=(const float f)
+        Normal<T> operator/=(const Float f)
         {
             assert(f != 0);
-            float inv = 1.0f / f;
+            Float inv = 1.0f / f;
             x *= inv;
             y *= inv;
             z *= inv;
             return (*this);
         }
 
-        inline float operator*(const Normal<T> &o) const
+        inline Float operator*(const Normal<T> &o) const
         {
             return x * o.x + y * o.y + z * o.z;
         }
 
-        inline float LengthSquared() const
+        inline Float LengthSquared() const
         {
             return (x * x + y * y + z * z);
         }
 
-        inline float norm() const
+        inline Float norm() const
         {
             return sqrtf(LengthSquared());
         }
@@ -81,9 +81,9 @@ namespace rengen::geometry
         }
     };
 
-    typedef Normal<float> N3f;
+    typedef Normal<Float> N3f;
     typedef Normal<int> N3i;
-    typedef Normal<float> Normal3f;
+    typedef Normal<Float> Normal3f;
     typedef Normal<int> Normal3i;
 
 }

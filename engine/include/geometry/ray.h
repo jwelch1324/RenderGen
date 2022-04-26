@@ -10,14 +10,14 @@ namespace rengen::geometry
     class COREDLL Ray
     {
     public:
-        Point<float> o;
-        Vector<float> d;
-        mutable float mint, maxt;
-        float time;
+        Point<Float> o;
+        Vector<Float> d;
+        mutable Float mint, maxt;
+        Float time;
         Ray() : mint(RAY_EPSILON), maxt(INFINITY), time(0.f) {}
-        Ray(const Point<float> &origin, const Vector<float> &direction, float start = RAY_EPSILON, float end = INFINITY, float t = 0.f) : o(origin), d(direction), mint(start), maxt(end), time(t) {}
+        Ray(const Point<Float> &origin, const Vector<Float> &direction, Float start = RAY_EPSILON, Float end = INFINITY, Float t = 0.f) : o(origin), d(direction), mint(start), maxt(end), time(t) {}
 
-        Point<float> operator()(float t) const { return o + t * d; }
+        Point<Float> operator()(Float t) const { return o + t * d; }
     };
 
     class COREDLL RayDifferential : public Ray

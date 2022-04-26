@@ -59,12 +59,12 @@ namespace rengen::geometry
             return (*this);
         }
 
-        Point<T> operator*(float f) const
+        Point<T> operator*(Float f) const
         {
             return Point<T>((T)(x * f), (T)(y * f), (T)(z * f));
         }
 
-        Point<T> &operator*(float f)
+        Point<T> &operator*(Float f)
         {
             x = T(x * f);
             y = T(y * f);
@@ -73,25 +73,25 @@ namespace rengen::geometry
         }
     };
 
-    typedef Point<float> Point3f;
-    typedef Point<float> P3f;
+    typedef Point<Float> Point3f;
+    typedef Point<Float> P3f;
     typedef Point<int> P3i;
     typedef Point<int> Point3i;
 
     template <class T>
-    inline float L2Distance(const Point<T> &p1, const Point<T> &p2)
+    inline Float L2Distance(const Point<T> &p1, const Point<T> &p2)
     {
         return (p1 - p2).norm();
     }
 
     template <class T>
-    inline float L2DistanceSquared(const Point<T> &p1, const Point<T> &p2)
+    inline Float L2DistanceSquared(const Point<T> &p1, const Point<T> &p2)
     {
         return (p1 - p2).LengthSquared();
     }
 
     template <class T>
-    inline Point<T> operator*(const float f, const Point<T> &p)
+    inline Point<T> operator*(const Float f, const Point<T> &p)
     {
         return p * f;
     }

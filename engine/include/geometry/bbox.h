@@ -61,13 +61,13 @@ namespace rengen::geometry
             return (p.x >= pMin.x) && (p.x <= pMax.x) && (p.y >= pMin.y) && (p.y <= pMax.y) && (p.z >= pMin.z) && (p.z <= pMax.z);
         }
 
-        float Volume() const
+        Float Volume() const
         {
             Vec3f v = pMax - pMin;
             return v.x * v.y * v.z;
         }
 
-        void Expand(float delta)
+        void Expand(Float delta)
         {
             pMin -= Vec3f(delta, delta, delta);
             pMax += Vec3f(delta, delta, delta);
@@ -90,7 +90,7 @@ namespace rengen::geometry
             }
         }
 
-        void BoundingSphere(P3f *c, float *rad) const
+        void BoundingSphere(P3f *c, Float *rad) const
         {
             *c = 0.5f * pMin + 0.5f * pMax;
             *rad = L2Distance(*c, pMax);

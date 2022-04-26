@@ -11,28 +11,28 @@ namespace rengen
         namespace ops
         {
             template <class T>
-            inline float Dot(const Vector<T> &v1, const Vector<T> &v2);
+            inline Float Dot(const Vector<T> &v1, const Vector<T> &v2);
 
             template <class T>
-            inline float Dot(const Vector<T> &v, const Normal<T> &n);
+            inline Float Dot(const Vector<T> &v, const Normal<T> &n);
 
             template <class T>
-            inline float Dot(const Normal<T> &n, const Vector<T> &v);
+            inline Float Dot(const Normal<T> &n, const Vector<T> &v);
 
             template <class T>
-            inline float Dot(const Normal<T> &n, const Normal<T> &n2);
+            inline Float Dot(const Normal<T> &n, const Normal<T> &n2);
 
             template <class T>
-            inline float AbsDot(const Vector<T> &v1, const Vector<T> &v2);
+            inline Float AbsDot(const Vector<T> &v1, const Vector<T> &v2);
 
             template <class T>
-            inline float AbsDot(const Vector<T> &v, const Normal<T> &n);
+            inline Float AbsDot(const Vector<T> &v, const Normal<T> &n);
 
             template <class T>
-            inline float AbsDot(const Normal<T> &n, const Vector<T> &v);
+            inline Float AbsDot(const Normal<T> &n, const Vector<T> &v);
 
             template <class T>
-            inline float AbsDot(const Normal<T> &n1, const Normal<T> &n2);
+            inline Float AbsDot(const Normal<T> &n1, const Normal<T> &n2);
 
             template <class T>
             inline Vector<T> Cross(const Vector<T> &v1, const Vector<T> &v2);
@@ -47,6 +47,12 @@ namespace rengen
             COREDLL BBox Union(const BBox &b1, const BBox &b2)
             {
                 return b1.Union(b2);
+            }
+
+            // Linear Interpolation
+            inline Float Lerp(Float t, Float v1, Float v2)
+            {
+                return (1.f - t) * v1 + t * v2;
             }
         }
     }

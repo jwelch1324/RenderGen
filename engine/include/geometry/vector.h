@@ -28,7 +28,7 @@ namespace rengen::geometry
             return (x != rhs.s) || (y != rhs.y) || (z != rhs.z);
         }
 
-        bool epsilon_eq(const Vector<T> &rhs, float eps = 1e-6) const
+        bool epsilon_eq(const Vector<T> &rhs, Float eps = 1e-6) const
         {
             return (abs(x - rhs.x) <= eps) && (abs(y - rhs.y) <= eps) && (abs(z - rhs.z) <= eps);
         }
@@ -61,12 +61,12 @@ namespace rengen::geometry
         }
 
         // Scaling of a Vector
-        Vector<T> operator*(float f) const
+        Vector<T> operator*(Float f) const
         {
             return Vector<T>((T)(x * f), (T)(y * f), (T)(z * f));
         }
 
-        Vector<T> &operator*=(float f)
+        Vector<T> &operator*=(Float f)
         {
             x = T(x * f);
             y = T(y * f);
@@ -74,17 +74,17 @@ namespace rengen::geometry
             return *this;
         }
 
-        Vector<T> operator/(float f) const
+        Vector<T> operator/(Float f) const
         {
             assert(f != 0);
-            float inv = 1.0f / f;
+            Float inv = 1.0f / f;
             return Vector<T>((T)(x * inv), (T)(y * inv), (T)(z * inv));
         }
 
-        Vector<T> operator/=(float f)
+        Vector<T> operator/=(Float f)
         {
             assert(f != 0);
-            float inv = 1.0f / f;
+            Float inv = 1.0f / f;
             x *= f;
             y *= f;
             z *= f;
@@ -93,12 +93,12 @@ namespace rengen::geometry
 
         // Vector Product Operators
         // Dot Product between two vectors
-        inline float operator*(const Vector<T> &rhs) const
+        inline Float operator*(const Vector<T> &rhs) const
         {
             return x * rhs.x + y * rhs.y + z * rhs.z;
         }
 
-        inline float cosine(const Vector<T> &o) const
+        inline Float cosine(const Vector<T> &o) const
         {
             return (this * o) / (this->norm() * o.norm());
         }
@@ -109,7 +109,7 @@ namespace rengen::geometry
             return Vector<T>(this->y * rhs.z - this->z * rhs.y, -(this->x * rhs.z - this->z * rhs.x), this->x * rhs.y - this->y * rhs.x);
         }
 
-        inline float sine(const Vector<T> &o) const
+        inline Float sine(const Vector<T> &o) const
         {
             // Sine of the angle is the ratio of the norm of the cross product and the product of norms of the individual vectors
             return ((*this) ^ o).norm() / (this->norm() * o.norm());
@@ -135,15 +135,15 @@ namespace rengen::geometry
         }
 
         // Normalization Functions
-        inline float norm() const
+        inline Float norm() const
         {
             // Perform dot product with self and take sqrt
             return sqrtf(*this * *this);
         }
 
-        inline float Length() const { return norm(); }
+        inline Float Length() const { return norm(); }
 
-        inline float LengthSquared() const { return *this * *this; }
+        inline Float LengthSquared() const { return *this * *this; }
 
         static inline Vector<T> Normalize(const Vector<T> &v)
         {
@@ -153,9 +153,9 @@ namespace rengen::geometry
         // Type Conversion Functions
 
         // Convert the current vector to a Vec3f
-        Vector<float> ToVec3f() const
+        Vector<Float> ToVec3f() const
         {
-            return Vector<float>(float(x), float(y), float(z));
+            return Vector<Float>(Float(x), Float(y), Float(z));
         }
 
         // Convert the current vector to a Vec3i
@@ -165,11 +165,11 @@ namespace rengen::geometry
         }
     };
 
-    typedef Vector<float> Vec3f;
+    typedef Vector<Float> Vec3f;
     typedef Vector<int> Vec3i;
 
     template <class T>
-    inline Vector<T> operator*(float f, const Vector<T> &v)
+    inline Vector<T> operator*(Float f, const Vector<T> &v)
     {
         return v * f;
     }

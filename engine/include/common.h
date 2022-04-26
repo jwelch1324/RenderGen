@@ -18,4 +18,12 @@
 #include <math.h>
 #include <assert.h>
 
+#ifdef PBRT_FLOAT_AS_DOUBLE
+typedef double Float;
+#else
+typedef float Float;
+#endif // PBRT_FLOAT_AS_DOUBLE
+
+#include "system/rengen_memory.h"
+
 #endif

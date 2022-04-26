@@ -69,6 +69,12 @@
         "utility": "cpp",
         "vector": "cpp",
         "xiosbase": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "__functional_03": "cpp",
+        "__tree": "cpp",
+        "any": "cpp",
+        "memory_resource": "cpp",
+        "set": "cpp",
+        "variant": "cpp"
     }
 }

@@ -7,9 +7,9 @@ using namespace rengen::geometry;
 TEST(NormalFromVector, BasicAssertions)
 {
     Vec3f v(1.1, 1.1, 1.1);
-    Normal<float> n;
-    n = Normal<float>(v);
-    EXPECT_EQ(n, Normal<float>(1.1, 1.1, 1.1));
+    Normal<Float> n;
+    n = Normal<Float>(v);
+    EXPECT_EQ(n, Normal<Float>(1.1, 1.1, 1.1));
 }
 
 TEST(VectorFromNormal, BasicAssertions)
