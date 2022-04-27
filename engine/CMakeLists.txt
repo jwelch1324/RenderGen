@@ -18,15 +18,25 @@ FetchContent_MakeAvailable(googletest)
 
 link_directories("/usr/local/lib")
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/tests *.cpp)
-add_library(rendergen ${SRC_FILES})
+add_library(rendergen STATIC ${SRC_FILES})
 target_include_directories(rendergen PRIVATE include)
 #target_link_libraries(tinyrenderer profiler)
 
+#add_subdirectory("thirdparty/benchmark")
+set(benchmark_DIR "../thirdparty/benchmark/build")
+find_package(benchmark REQUIRED)
+
 enable_testing()
-file(GLOB_RECURSE TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/tests *.cc)
+file(GLOB_RECURSE TEST_SRC_FILES ${PROJECT_SOURCE_DIR}/tests/*.cc)
 add_executable(rendergentest ${TEST_SRC_FILES})
 target_link_libraries(rendergentest gtest_main)
+target_link_libraries(rendergentest rendergen)
 target_include_directories(rendergentest PRIVATE ${PROJECT_SOURCE_DIR}/include)
+
+file(GLOB_RECURSE BENCH_SRC_FILES ${PROJECT_SOURCE_DIR}/benchmarks/*.cc)
+add_executable(rendergenbench ${BENCH_SRC_FILES})
+target_link_libraries(rendergenbench rendergen benchmark::benchmark)
+target_include_directories(rendergenbench PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 include(GoogleTest)
 gtest_discover_tests(rendergentest)

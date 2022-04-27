@@ -12,6 +12,11 @@ namespace rengen::geometry
     public:
         T m[4][4];
 
+        inline T *operator[](int idx)
+        {
+            return m[idx];
+        }
+
         Matrix4x4()
         {
             for (int i = 0; i < 4; i++)
