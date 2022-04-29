@@ -1,8 +1,13 @@
 #include <iostream>
 #include <chrono>
-#include "tgaimage.h"
-#include "model.h"
+#include "geometry/point.h"
+#include "geometry/vector.h"
+#include "geometry.h"
+#include "io/tgaimage.h"
+#include "io/obj_file.h"
 #include "draw.h"
+
+using namespace rengen::io;
 
 TGAColor white = TGAColor(255, 255, 255, 255);
 auto red = TGAColor(255, 0, 0, 255);
@@ -51,7 +56,7 @@ void renderHeadFlatFast()
     auto height = 1000;
     TGAImage image(width, height, TGAImage::RGB);
 
-    auto model = Model("african_head.obj");
+    auto model = ObjFile("african_head.obj");
 
     for (auto i = 0; i < model.nfaces(); i++)
     {
@@ -88,7 +93,7 @@ void renderHeadShaded()
         zbuffer[i] = -std::numeric_limits<float>::max();
     }
 
-    auto model = Model("african_head.obj");
+    auto model = ObjFile("african_head.obj");
 
     for (auto i = 0; i < model.nfaces(); i++)
     {
@@ -99,7 +104,7 @@ void renderHeadShaded()
         // Face definition format -- first number in each group is a vertex making up the triangle.
         // f 1193/1240/1193 1180/1227/1180 1179/1226/1179
         // Now we loop through the vertices in each face and draw the lines connecting all the vertices (which are in x,y,z format)
-        Vec3f t[3];
+        Point3f t[3];
         for (int j = 0; j < 3; j++)
         {
             auto v0 = model.vert(face.vertIdx_[j]);
@@ -110,7 +115,7 @@ void renderHeadShaded()
 
         // Get the normal to the triangle
         auto zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^ (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
-        zz.normalize();
+        zz = Vec3f::Normalize(zz);
 
         // Get light intensity as scalar product of light vector with normal
         auto ivec = zz * lightVec;
@@ -131,7 +136,7 @@ void renderHeadFlatSweep()
     auto height = 1000;
     TGAImage image(width, height, TGAImage::RGB);
 
-    auto model = Model("african_head.obj");
+    auto model = ObjFile("african_head.obj");
 
     for (auto i = 0; i < model.nfaces(); i++)
     {
@@ -161,7 +166,7 @@ void renderHeadWireframe(int, char **)
     auto height = 1000;
     TGAImage image(width, height, TGAImage::RGB);
 
-    auto model = Model("african_head.obj");
+    auto model = ObjFile("african_head.obj");
 
     // For each face in the mesh we want to draw the lines which make up the border of the triangle
     for (auto i = 0; i < model.nfaces(); i++)
@@ -207,7 +212,7 @@ void renderHeadTextured()
         zbuffer[i] = -std::numeric_limits<float>::max();
     }
 
-    auto model = Model("african_head.obj");
+    auto model = ObjFile("african_head.obj");
 
     for (auto i = 0; i < model.nfaces(); i++)
     {
@@ -222,13 +227,13 @@ void renderHeadTextured()
         for (int j = 0; j < 3; j++)
         {
             auto v0 = model.vert(face.vertIdx_[j]);
-            tri._verts.push_back(Vec3f());
+            tri._verts.push_back(Point3f());
             tri._verts[j].x = (v0.x + 1) * width / 2.;
             tri._verts[j].y = (v0.y + 1) * height / 2.;
             tri._verts[j].z = (v0.z);
 
-            auto texVerts = model.tvert(face.tvertIdx_[j]);
-            tri._tverts.push_back(Vec3f(texVerts.x*twidth, texVerts.y*theight,0));
+            Vec3f texVerts = model.tvert(face.tvertIdx_[j]);
+            tri._tverts.push_back(Point3f(texVerts.x*twidth, texVerts.y*theight,0));
         }
 
 
@@ -236,7 +241,7 @@ void renderHeadTextured()
 
         // Get the normal to the triangle
         auto zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^ (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
-        zz.normalize();
+        zz = Vec3f::Normalize(zz);
 
         // Get light intensity as scalar product of light vector with normal
         auto ivec = zz * lightVec;
@@ -251,11 +256,11 @@ void renderHeadTextured()
         }
     }
 
-    image.write_tga_file("renderShadedTexture.tga");
+    image.write_tga_file("renderShadedTexture2.tga");
 }
 
 
-int main(int argc, char **argv)
+int main3(int argc, char **argv)
 {
     // //main2(argc, argv);
     // auto s = std::chrono::high_resolution_clock::now();
@@ -264,7 +269,8 @@ int main(int argc, char **argv)
     // printf("Took %lld microseconds for Sweep Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
 
     auto s = std::chrono::high_resolution_clock::now();
-    draw::renderHeadTexturedProjective();
+    renderHeadTextured();
     auto e = std::chrono::high_resolution_clock::now();
     printf("Took %lld microseconds for Fast Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
+    return 0;
 }

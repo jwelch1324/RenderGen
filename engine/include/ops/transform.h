@@ -3,7 +3,10 @@
 
 #include "common.h"
 #include "geometry/bbox.h"
-#include "geometry/geometry.h"
+#include "geometry/matrix.h"
+#include "geometry/normal.h"
+#include "geometry/normal.h"
+#include "geometry/ray.h"
 
 namespace rengen::ops {
 class COREDLL Transform {
@@ -22,25 +25,49 @@ public:
 
   Transform GetInverse() const { return Transform(m_matInv, m_mat); }
 
+  // Point Transform operations
   geometry::Point3f operator()(const geometry::Point3f &pt) const;
   void operator()(const geometry::Point3f &pt, geometry::Point3f *ptrans) const;
+
+  // Vector Transform Operations
   geometry::Vec3f operator()(const geometry::Vec3f &vec) const;
   void operator()(const geometry::Vec3f &vec, geometry::Vec3f *vtrans) const;
+
+  // Normal Transform Operations
   geometry::Normal3f operator()(const geometry::Normal3f &n) const;
   void operator()(const geometry::Normal3f &n,
                   geometry::Normal3f *ntrans) const;
+
+  // Ray Transform Operations
   geometry::Ray operator()(const geometry::Ray &r) const;
   void operator()(const geometry::Ray &r, geometry::Ray *rtrans) const;
 
+  // Bounding Box Transform Operations
   inline geometry::BBox operator()(const geometry::BBox &bbox) const {
-    return FastTransform(bbox);
+    return FastBBoxTransform(bbox);
   }
-
+  geometry::BBox SlowBBoxTransform(const geometry::BBox &b) const;
+  geometry::BBox FastBBoxTransform(const geometry::BBox &b) const;
   void operator()(const geometry::BBox &bbox, geometry::BBox *bboxtrans) const;
 
-  geometry::BBox SlowTransform(const geometry::BBox &b) const;
-  geometry::BBox FastTransform(const geometry::BBox &b) const;
+  // Transform Compositions
+  Transform operator*(const Transform &t2) const;
 
+  // Detect if Transform will Swap Handedness
+  bool SwapsHandedness() const {
+    float det =
+        ((m_mat.m[0][0] *
+          (m_mat.m[1][1] * m_mat.m[2][2] - m_mat.m[1][2] * m_mat.m[2][1])) -
+         (m_mat.m[0][1] *
+          (m_mat.m[1][0] * m_mat.m[2][2] - m_mat.m[1][2] * m_mat.m[2][0])) +
+         (m_mat.m[0][2] *
+          (m_mat.m[1][0] * m_mat.m[2][1] - m_mat.m[1][1] * m_mat.m[2][0])));
+    return det < 0.f;
+  }
+
+  std::string ToString() const {
+    return m_mat.ToString();
+  }
 private:
   geometry::Matrix4f m_mat, m_matInv;
 };

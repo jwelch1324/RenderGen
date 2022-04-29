@@ -12,7 +12,7 @@ TEST(BBoxTransformTest, BasicAssertions) {
   auto tr = Translate(Vec3f(1, 1, 1));
 
   auto newBB = tr(b0);
-  auto newFastBB = tr.FastTransform(b0);
+  auto newFastBB = tr.FastBBoxTransform(b0);
   EXPECT_TRUE(newBB.epsilonEqual(newFastBB));
 
   auto str = Scale(Vec3f(1, 2, 3));

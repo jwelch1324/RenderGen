@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstring>
-#include "tgaimage.h"
+#include "io/tgaimage.h"
+
+namespace rengen::io {
 
 TGAImage::TGAImage(const int w, const int h, const int bpp) : w(w), h(h), bpp(bpp), data(w*h*bpp, 0) {}
 
@@ -238,3 +240,4 @@ int TGAImage::height() const {
 }
 
 
+}

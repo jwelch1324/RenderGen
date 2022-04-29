@@ -7,5 +7,6 @@
 #include "geometry/ray.h"
 #include "geometry/bbox.h"
 #include "geometry/matrix.h"
+#include "geometry/quaternion.h"
 
 #endif

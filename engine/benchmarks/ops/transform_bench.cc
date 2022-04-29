@@ -17,14 +17,14 @@ static void BM_BBoxSlowTransform(benchmark::State &state) {
   BBox b0(Point3f(0, 0, 0), Point3f(1, 1, 1));
   auto tr = Translate(Vec3f(1, 1, 1));
   for (auto _ : state)
-    auto newBB = tr.SlowTransform(b0);
+    auto newBB = tr.SlowBBoxTransform(b0);
 }
 
 static void BM_BBoxFastTransform(benchmark::State &state) {
   BBox b0(Point3f(0, 0, 0), Point3f(1, 1, 1));
   auto tr = Translate(Vec3f(1, 1, 1));
   for (auto _ : state)
-    auto newBB = tr.FastTransform(b0);
+    auto newBB = tr.FastBBoxTransform(b0);
 }
 
 BENCHMARK(BM_BBoxDefaultTransform);

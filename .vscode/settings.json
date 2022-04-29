@@ -1,6 +1,6 @@
 {
     "cmakeExplorer.buildDir": "${buildDirectory}",
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "files.associations": {
         "__bit_reference": "cpp",
         "__bits": "cpp",

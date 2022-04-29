@@ -17,12 +17,14 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+enable_testing()
 add_subdirectory("engine")
 
 link_directories("/usr/local/lib")
-add_executable(tinyrenderer src/main.cpp src/tgaimage.cpp src/model.cpp src/geometry.cpp)
-target_include_directories(tinyrenderer PRIVATE include)
-#target_link_libraries(tinyrenderer profiler)
+file(GLOB_RECURSE MAIN_SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+add_executable(tinyrenderer ${MAIN_SRC_FILES})
+target_include_directories(tinyrenderer PRIVATE include engine/include)
+target_link_libraries(tinyrenderer rendergen)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

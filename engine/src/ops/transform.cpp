@@ -1,6 +1,7 @@
 #include "ops/transform.h"
 #include "common.h"
 #include "geometry/bbox.h"
+#include "geometry/matrix.h"
 #include "geometry/point.h"
 #include "geometry/vector.h"
 
@@ -8,16 +9,16 @@ namespace rengen::ops {
 using namespace geometry;
 
 Point3f Transform::operator()(const Point3f &pt) const {
-  float x = pt.x;
-  float y = pt.y;
-  float z = pt.z;
-  float xp =
+  Float x = pt.x;
+  Float y = pt.y;
+  Float z = pt.z;
+  Float xp =
       m_mat.m[0][0] * x + m_mat.m[0][1] * y + m_mat.m[0][2] * z + m_mat.m[0][3];
-  float yp =
+  Float yp =
       m_mat.m[1][0] * x + m_mat.m[1][1] * y + m_mat.m[1][2] * z + m_mat.m[1][3];
-  float zp =
+  Float zp =
       m_mat.m[2][0] * x + m_mat.m[2][1] * y + m_mat.m[2][2] * z + m_mat.m[2][3];
-  float wp =
+  Float wp =
       m_mat.m[3][0] * x + m_mat.m[3][1] * y + m_mat.m[3][2] * z + m_mat.m[3][3];
 
   assert(wp != 0);
@@ -28,16 +29,16 @@ Point3f Transform::operator()(const Point3f &pt) const {
 }
 
 void Transform::operator()(const Point3f &pt, Point3f *ptrans) const {
-  float x = pt.x;
-  float y = pt.y;
-  float z = pt.z;
+  Float x = pt.x;
+  Float y = pt.y;
+  Float z = pt.z;
   ptrans->x =
       m_mat.m[0][0] * x + m_mat.m[0][1] * y + m_mat.m[0][2] * z + m_mat.m[0][3];
   ptrans->y =
       m_mat.m[1][0] * x + m_mat.m[1][1] * y + m_mat.m[1][2] * z + m_mat.m[1][3];
   ptrans->z =
       m_mat.m[2][0] * x + m_mat.m[2][1] * y + m_mat.m[2][2] * z + m_mat.m[2][3];
-  float wp =
+  Float wp =
       m_mat.m[3][0] * x + m_mat.m[3][1] * y + m_mat.m[3][2] * z + m_mat.m[3][3];
 
   assert(wp != 0);
@@ -46,41 +47,41 @@ void Transform::operator()(const Point3f &pt, Point3f *ptrans) const {
 }
 
 Vec3f Transform::operator()(const Vec3f &vec) const {
-  float x = vec.x;
-  float y = vec.y;
-  float z = vec.z;
-  float xp = m_mat.m[0][0] * x + m_mat.m[0][1] * y + m_mat.m[0][2] * z;
-  float yp = m_mat.m[1][0] * x + m_mat.m[1][1] * y + m_mat.m[1][2] * z;
-  float zp = m_mat.m[2][0] * x + m_mat.m[2][1] * y + m_mat.m[2][2] * z;
+  Float x = vec.x;
+  Float y = vec.y;
+  Float z = vec.z;
+  Float xp = m_mat.m[0][0] * x + m_mat.m[0][1] * y + m_mat.m[0][2] * z;
+  Float yp = m_mat.m[1][0] * x + m_mat.m[1][1] * y + m_mat.m[1][2] * z;
+  Float zp = m_mat.m[2][0] * x + m_mat.m[2][1] * y + m_mat.m[2][2] * z;
 
   return Vec3f(xp, yp, zp);
 }
 
 void Transform::operator()(const Vec3f &vec, Vec3f *vtrans) const {
-  float x = vec.x;
-  float y = vec.y;
-  float z = vec.z;
+  Float x = vec.x;
+  Float y = vec.y;
+  Float z = vec.z;
   vtrans->x = m_mat.m[0][0] * x + m_mat.m[0][1] * y + m_mat.m[0][2] * z;
   vtrans->y = m_mat.m[1][0] * x + m_mat.m[1][1] * y + m_mat.m[1][2] * z;
   vtrans->z = m_mat.m[2][0] * x + m_mat.m[2][1] * y + m_mat.m[2][2] * z;
 }
 
 Normal3f Transform::operator()(const Normal3f &n) const {
-  float x = n.x;
-  float y = n.y;
-  float z = n.z;
+  Float x = n.x;
+  Float y = n.y;
+  Float z = n.z;
 
-  float xp = m_matInv.m[0][0] * x + m_matInv.m[1][0] * y + m_matInv.m[2][0] * z;
-  float yp = m_matInv.m[0][1] * x + m_matInv.m[1][1] * y + m_matInv.m[2][1] * z;
-  float zp = m_matInv.m[0][2] * x + m_matInv.m[1][2] * y + m_matInv.m[2][2] * z;
+  Float xp = m_matInv.m[0][0] * x + m_matInv.m[1][0] * y + m_matInv.m[2][0] * z;
+  Float yp = m_matInv.m[0][1] * x + m_matInv.m[1][1] * y + m_matInv.m[2][1] * z;
+  Float zp = m_matInv.m[0][2] * x + m_matInv.m[1][2] * y + m_matInv.m[2][2] * z;
 
   return Normal3f(xp, yp, zp);
 }
 
 void Transform::operator()(const Normal3f &n, Normal3f *ntrans) const {
-  float x = n.x;
-  float y = n.y;
-  float z = n.z;
+  Float x = n.x;
+  Float y = n.y;
+  Float z = n.z;
 
   ntrans->x =
       m_matInv.m[0][0] * x + m_matInv.m[1][0] * y + m_matInv.m[2][0] * z;
@@ -110,7 +111,7 @@ void Transform::operator()(const Ray &r, Ray *rtrans) const {
   rtrans->time = r.time;
 }
 
-BBox Transform::SlowTransform(const BBox &b) const {
+BBox Transform::SlowBBoxTransform(const BBox &b) const {
   const Transform &M = (*this);
   BBox ret(M(Point3f(b.pMin.x, b.pMin.y, b.pMin.z)));
   ret = ret.Union(M(Point3f(b.pMin.x, b.pMin.y, b.pMax.z)));
@@ -126,7 +127,7 @@ BBox Transform::SlowTransform(const BBox &b) const {
   return ret;
 }
 
-BBox Transform::FastTransform(const geometry::BBox &b) const {
+BBox Transform::FastBBoxTransform(const geometry::BBox &b) const {
   BBox ret;
 
   Vec3f ex(b.pMax.x - b.pMin.x, 0, 0);
@@ -145,6 +146,11 @@ BBox Transform::FastTransform(const geometry::BBox &b) const {
   auto newPmax = newPmin + pez + pey + pex;
 
   return BBox(newPmin, newPmax);
+}
+
+Transform Transform::operator*(const Transform &t2) const {
+  return Transform(Matrix4f::MatMul(this->m_mat, t2.m_mat),
+                   Matrix4f::MatMul(t2.m_matInv, this->m_matInv));
 }
 
 } // namespace rengen::ops

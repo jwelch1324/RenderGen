@@ -3,6 +3,8 @@
 #include <fstream>
 #include <vector>
 
+namespace rengen::io {
+
 #pragma pack(push,1)
 struct TGAHeader {
     std::uint8_t  idlength{};
@@ -55,3 +57,4 @@ private:
     std::vector<std::uint8_t> data = {};
 };
 
+}
