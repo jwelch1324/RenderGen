@@ -148,8 +148,8 @@ inline void triangleBoundingBox(Vec2i &A, Vec2i &B, Vec2i &C, int *bbox_out) {
   bbox_out[3] = std::max(std::max(A.y, B.y), C.y);
 }
 
-inline void triangleBoundingBox3D(Point3f &A, Point3f &B, Point3f &C, int *bbox_out,
-                                  Vec2f clamp) {
+inline void triangleBoundingBox3D(Point3f &A, Point3f &B, Point3f &C,
+                                  int *bbox_out, Vec2f clamp) {
   // Bbox will be in the form [minx, miny, maxx, maxy]
   bbox_out[0] = std::max(0.f, std::min(std::min(A.x, B.x), C.x));
   bbox_out[1] = std::max(0.f, std::min(std::min(A.y, B.y), C.y));
@@ -363,10 +363,23 @@ void renderHeadTexturedProjective() {
 
   // Matrix vp = viewport(image.width()/8, image.height()/8, image.width() * 3 /
   // 4, image.height() * 3 / 4);
-  Transform objToWorld = tMove*tScale*tproj;
+  Matrix4f vpm;
+  vpm.m[0][3] = tx + tw / 2.f;
+  vpm.m[1][3] = ty + th / 2.f;
+  vpm.m[2][3] = 255 / 2.f;
+  vpm.m[0][0] = tw / 2.f;
+  vpm.m[1][1] = th / 2.f;
+  vpm.m[2][2] = 255 / 2.f;
+  Transform vpt = Transform(vpm);
+  Transform objToWorld = vpt * tproj;
   std::cout << "Translate: \n"
             << tMove.ToString() << "Scale:\n"
-            << tScale.ToString() << "Proj:\n" << tproj.ToString();
+            << tScale.ToString() << "Proj:\n"
+            << tproj.ToString() << "\n\n\n"
+            << "Viewport:\n"
+            << (tScale * tMove).ToString()
+            << "Viewport new:\n"
+            << vpt.ToString();
   std::cout << objToWorld.ToString();
   for (int i = 0; i < model.nfaces(); i++) {
     //  printf("\r%d : %d", i, model.nfaces());
@@ -376,31 +389,27 @@ void renderHeadTexturedProjective() {
     // up the triangle. f 1193/1240/1193 1180/1227/1180 1179/1226/1179 Now we
     // loop through the vertices in each face and draw the lines connecting all
     // the vertices (which are in x,y,z format)
-    //Vec3f t[3];
+    // Vec3f t[3];
     Triangle tri = draw::Triangle();
     for (int j = 0; j < 3; j++) {
       Vec3f v0 = model.vert(face.vertIdx_[j]);
-      Point3f p0(v0.x,v0.y,v0.z);
+      Point3f p0(v0.x, v0.y, v0.z);
       Point3f newpoint = objToWorld(p0);
-
+        printf("%f,%f,%f\n",p0.x,p0.y,p0.z);
       tri._verts.push_back(newpoint);
 
       Vec3f texVerts = model.tvert(face.tvertIdx_[j]);
       tri._tverts.push_back(
           Point3f(texVerts.x * twidth, texVerts.y * theight, 0));
     }
-
-    auto tpoints = std::vector<Vec3f>{model.vert(face.vertIdx_[0]),model.vert(face.vertIdx_[1]),model.vert(face.vertIdx_[2])};
-    std::sort(tpoints.begin(), tpoints.end(),
-            [](Vec3f a, Vec3f b) { return a.y < b.y; });
-
     // Get the normal to the triangle
     Vec3f zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^
-              (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
-    //Vec3f zz = (tpoints[2]-tpoints[0])^(tpoints[1]-tpoints[0]);
+               (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
+    //Vec3f zz = (tri._verts[2] - tri._verts[0])^(tri._verts[1]-tri._tverts[0]);
+    // Vec3f zz = (tpoints[2]-tpoints[0])^(tpoints[1]-tpoints[0]);
     zz = Vec3f::Normalize(zz);
     printf("zz: %f,%f,%f\n",zz.x,zz.y,zz.z);
-    // Get light intensity as scalar product of light vector with normal
+    //  Get light intensity as scalar product of light vector with normal
     auto ivec = zz * Vec3f::Normalize(lightVec);
     printf("%f\n", ivec);
 

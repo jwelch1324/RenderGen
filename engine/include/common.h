@@ -16,6 +16,7 @@
 #define RAY_EPSILON 1e-3f
 
 #include <math.h>
+#include <cmath>
 #include <assert.h>
 
 #ifdef PBRT_FLOAT_AS_DOUBLE

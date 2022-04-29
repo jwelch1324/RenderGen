@@ -260,7 +260,7 @@ void renderHeadTextured()
 }
 
 
-int main3(int argc, char **argv)
+int main(int argc, char **argv)
 {
     // //main2(argc, argv);
     // auto s = std::chrono::high_resolution_clock::now();
@@ -269,7 +269,7 @@ int main3(int argc, char **argv)
     // printf("Took %lld microseconds for Sweep Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
 
     auto s = std::chrono::high_resolution_clock::now();
-    renderHeadTextured();
+    draw::renderHeadTexturedProjective();
     auto e = std::chrono::high_resolution_clock::now();
     printf("Took %lld microseconds for Fast Render\n", std::chrono::duration_cast<std::chrono::microseconds>(e - s).count());
     return 0;

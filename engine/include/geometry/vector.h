@@ -146,14 +146,14 @@ public:
   // Normalization Functions
   inline Float norm() const {
     // Perform dot product with self and take sqrt
-    return sqrtf(*this * *this);
+    return std::sqrt(x*x+y*y+z*z);
   }
 
   inline Float Length() const { return norm(); }
 
   inline Float LengthSquared() const { return *this * *this; }
 
-  static inline Vector<T> Normalize(const Vector<T> &v) { return v / v.norm(); }
+  static inline Vector<T> Normalize(const Vector<T> &v) { return v * 1/v.norm(); }
 
   // Type Conversion Functions
 
