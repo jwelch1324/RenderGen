@@ -355,7 +355,6 @@ void renderHeadTexturedProjective() {
   Float ty = image.height() / 8.f;
   Float tw = image.width() * 3.f / 4.f;
   Float th = image.height() * 3.f / 4.f;
-  std::cout << tx << " " << ty << " " << tw << " " << th << std::endl;
 
   Transform tMove =
       rengen::ops::Translate(Vec3f(tx + tw / 2.f, ty + th / 2.f, 255 / 2.f));
@@ -371,15 +370,8 @@ void renderHeadTexturedProjective() {
   vpm.m[1][1] = th / 2.f;
   vpm.m[2][2] = 255 / 2.f;
   Transform vpt = Transform(vpm);
-  Transform objToWorld = vpt * tproj;
-  std::cout << "Translate: \n"
-            << tMove.ToString() << "Scale:\n"
-            << tScale.ToString() << "Proj:\n"
-            << tproj.ToString() << "\n\n\n"
-            << "Viewport:\n"
-            << (tScale * tMove).ToString()
-            << "Viewport new:\n"
-            << vpt.ToString();
+  Transform objToWorld = (tMove*tScale) * tproj;
+
   std::cout << objToWorld.ToString();
   for (int i = 0; i < model.nfaces(); i++) {
     //  printf("\r%d : %d", i, model.nfaces());
@@ -395,7 +387,6 @@ void renderHeadTexturedProjective() {
       Vec3f v0 = model.vert(face.vertIdx_[j]);
       Point3f p0(v0.x, v0.y, v0.z);
       Point3f newpoint = objToWorld(p0);
-        printf("%f,%f,%f\n",p0.x,p0.y,p0.z);
       tri._verts.push_back(newpoint);
 
       Vec3f texVerts = model.tvert(face.tvertIdx_[j]);
@@ -405,13 +396,11 @@ void renderHeadTexturedProjective() {
     // Get the normal to the triangle
     Vec3f zz = (model.vert(face.vertIdx_[2]) - model.vert(face.vertIdx_[0])) ^
                (model.vert(face.vertIdx_[1]) - model.vert(face.vertIdx_[0]));
-    //Vec3f zz = (tri._verts[2] - tri._verts[0])^(tri._verts[1]-tri._tverts[0]);
-    // Vec3f zz = (tpoints[2]-tpoints[0])^(tpoints[1]-tpoints[0]);
     zz = Vec3f::Normalize(zz);
-    printf("zz: %f,%f,%f\n",zz.x,zz.y,zz.z);
+
     //  Get light intensity as scalar product of light vector with normal
-    auto ivec = zz * Vec3f::Normalize(lightVec);
-    printf("%f\n", ivec);
+    auto ivec = zz *lightVec;
+
 
     if (ivec > 0) {
       draw::texturedTriangle(tri, zbuffer, image, tex, ivec);

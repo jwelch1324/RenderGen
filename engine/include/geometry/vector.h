@@ -68,7 +68,7 @@ public:
   }
 
   Vector<T> operator-(const Vector<T> &v) const {
-    return Vector<T>(x - v.x, y - v.y, z - v.y);
+    return Vector<T>(x - v.x, y - v.y, z - v.z);
   }
 
   Vector<T> &operator-=(const Vector<T> &v) {
@@ -118,9 +118,9 @@ public:
 
   // Cross Product between two vectors
   inline Vector<T> operator^(const Vector<T> &rhs) const {
-    return Vector<T>(this->y * rhs.z - this->z * rhs.y,
-                     (this->z * rhs.x - this->x * rhs.z),
-                     this->x * rhs.y - this->y * rhs.x);
+    return Vector<T>(y * rhs.z - z * rhs.y, z * rhs.x - x * rhs.z,
+                     x * rhs.y - y * rhs.x);
+    // y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x
   }
 
   inline Float sine(const Vector<T> &o) const {
@@ -146,14 +146,16 @@ public:
   // Normalization Functions
   inline Float norm() const {
     // Perform dot product with self and take sqrt
-    return std::sqrt(x*x+y*y+z*z);
+    return std::sqrt(x * x + y * y + z * z);
   }
 
   inline Float Length() const { return norm(); }
 
   inline Float LengthSquared() const { return *this * *this; }
 
-  static inline Vector<T> Normalize(const Vector<T> &v) { return v * 1/v.norm(); }
+  static inline Vector<T> Normalize(const Vector<T> &v) {
+    return v * 1 / v.norm();
+  }
 
   // Type Conversion Functions
 
