@@ -5,6 +5,7 @@
 
 namespace rengen::geometry {
 template <class T> class COREDLL Normal;
+template <class T> class COREDLL Point;
 
 template <class t> struct Vec2 {
   t x, y;
@@ -40,6 +41,7 @@ public:
   Vector<T>(T _x = 0, T _y = 0, T _z = 0) : x(_x), y(_y), z(_z) {}
 
   explicit Vector<T>(const Normal<T> &n) : x(n.x), y(n.y), z(n.z) {}
+  explicit Vector<T>(const Point<T> &p) :x(p.x),y(p.y),z(p.z) {}
 
   // Equality of Two Vectors
   bool operator==(const Vector<T> &rhs) const {

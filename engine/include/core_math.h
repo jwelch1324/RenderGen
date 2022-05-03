@@ -3,7 +3,9 @@
 
 #include "common.h"
 #include "geometry/geometry.h"
+#include "geometry/point.h"
 #include "geometry/quaternion.h"
+#include "geometry/vector.h"
 #include <cmath>
 
 namespace rengen::geometry::ops {
@@ -45,6 +47,19 @@ inline BBox Union(const BBox &b1, const BBox &b2) { return b1.Union(b2); }
 inline Float Lerp(Float t, Float v1, Float v2) {
   return (1.f - t) * v1 + t * v2;
 }
+
+//Linear Vector Interpolation
+template <typename T>
+inline Vec3f VLerp(Float t, const Vector<T> &v1, const Vector<T> &v2) {
+  return (1.f-t)*v1 + t*v2;
+}
+
+//Linear Point Interpolation
+template <typename T>
+inline Point3f PLerp(Float t, const Point<T> &v1, const Point<T> &v2) {
+  return (1.f-t)*v1 + t*v2;
+}
+
 } // namespace rengen::geometry::ops
 
 #endif

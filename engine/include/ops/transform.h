@@ -149,6 +149,21 @@ inline Transform LookAt(const geometry::Vec3f &camera,
   return Transform(camToWorld.Inverse(), camToWorld);
 }
 
+inline Transform Viewport(int x, int y, int w, int h, int depth = 255) {
+  //Maps the bi-unit cube [-1,1]x[-1,1]x[-1,1] to [x,x+w]*[y,y+h]*[0,d]
+
+  geometry::Matrix4f m;
+  m[0][3] = x+w/2.f;
+  m[1][3] = y+h/2.f;
+  m[2][3] = depth/2.f;
+
+  m[0][0] = w/2.f;
+  m[1][1] = h/2.f;
+  m[2][2] = depth/2.f;
+
+  return Transform(m);
+}
+
 inline Transform Rotate(Float angle, const geometry::Vec3f &axis) {
   using namespace geometry;
   Vec3f a = Vec3f::Normalize(axis);

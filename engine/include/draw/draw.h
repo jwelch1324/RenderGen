@@ -12,7 +12,7 @@
 #include <iostream>
 #include <math.h>
 
-namespace draw {
+namespace rengen::draw {
 using namespace rengen::geometry;
 using namespace rengen::io;
 using namespace rengen::ops;
@@ -21,8 +21,8 @@ struct Triangle {
   std::vector<Point3f> _tverts;
 };
 
-auto white = TGAColor(255, 255, 255, 255);
-void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
+auto white = RGBAColor(255, 255, 255, 255);
+void line(int x0, int y0, int x1, int y1, TGAImage &image, RGBAColor color) {
   bool steep = false;
   if (std::abs(x0 - x1) < std::abs(y0 - y1)) {
     std::swap(x0, y0);
@@ -51,10 +51,10 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
     }
   }
 }
-void line(Vec2i t0, Vec2i t1, TGAImage &image, TGAColor &color) {
+void line(Vec2i t0, Vec2i t1, TGAImage &image, RGBAColor &color) {
   line(t0.x, t0.y, t1.x, t1.y, image, color);
 }
-void line2(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
+void line2(int x0, int y0, int x1, int y1, TGAImage &image, RGBAColor color) {
   bool steep = false;
   if (std::abs(x0 - x1) < std::abs(y0 - y1)) {
     std::swap(x0, y0);
@@ -80,14 +80,14 @@ void line2(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor color) {
   }
 }
 void triangleold(Vec2i t0, Vec2i t1, Vec2i t2, TGAImage &image,
-                 TGAColor &color) {
+                 RGBAColor &color) {
   line(t0, t1, image, color);
   line(t1, t2, image, color);
   line(t2, t0, image, color);
 }
 
 void trianglesweep(Vec2i t0, Vec2i t1, Vec2i t2, TGAImage &image,
-                   TGAColor &color) {
+                   RGBAColor &color) {
   // Sort the vertices by y coordinate lowest to highest
   // if (t0.y > t1.y)
   //     std::swap(t0, t1);
@@ -185,7 +185,7 @@ Point3f barycentricf(Point3f *points, Vec2f P) {
   return Point3f(1.f - (u.x + u.y) / u.z, u.y / u.z, u.x / u.z);
 }
 
-void trianglestd(Vec2i A, Vec2i B, Vec2i C, TGAImage &image, TGAColor &color) {
+void trianglestd(Vec2i A, Vec2i B, Vec2i C, TGAImage &image, RGBAColor &color) {
   // Sort by Y coordinate -- Not sure if this is still needed here...
   std::vector<Vec2i> points{A, B, C};
   std::sort(points.begin(), points.end(),
@@ -253,7 +253,7 @@ void texturedTriangle(Triangle tri, float *zbuffer, TGAImage &image,
                   tri._tverts[2].x * bc_mask.z;
         float v = tri._tverts[0].y * bc_mask.x + tri._tverts[1].y * bc_mask.y +
                   tri._tverts[2].y * bc_mask.z;
-        TGAColor color = texture.get(u, v);
+        RGBAColor color = texture.get(u, v);
         for (int l = 0; l < 3; l++) {
           color.bgra[l] = uint8_t(float(color.bgra[l]) * ivec);
         }
@@ -265,7 +265,7 @@ void texturedTriangle(Triangle tri, float *zbuffer, TGAImage &image,
 }
 
 void triangle(Point3f A, Point3f B, Point3f C, float *zbuffer, TGAImage &image,
-              TGAColor &color) {
+              RGBAColor &color) {
   // Sort by Y coordinate -- Not sure if this is still needed here...
   std::vector<Point3f> points{A, B, C};
   // std::sort(points.begin(), points.end(),
@@ -347,7 +347,7 @@ void renderHeadTexturedProjective() {
   // proj[3][3] = 1;
 
   Matrix4f projm;
-  projm.m[3][2] = -1.f / 2.0f;
+  projm.m[3][2] = -1.f / 0.9f;
   Transform tproj = rengen::ops::Transform(projm);
   // Matrix proj = Matrix::identity(4);
   // proj[3][2] = -1.f/3.0f;
@@ -356,21 +356,9 @@ void renderHeadTexturedProjective() {
   Float tw = image.width() * 3.f / 4.f;
   Float th = image.height() * 3.f / 4.f;
 
-  Transform tMove =
-      rengen::ops::Translate(Vec3f(tx + tw / 2.f, ty + th / 2.f, 255 / 2.f));
-  Transform tScale = rengen::ops::Scale(Vec3f(tw / 2.f, th / 2.f, 255 / 2.f));
-
-  // Matrix vp = viewport(image.width()/8, image.height()/8, image.width() * 3 /
-  // 4, image.height() * 3 / 4);
-  Matrix4f vpm;
-  vpm.m[0][3] = tx + tw / 2.f;
-  vpm.m[1][3] = ty + th / 2.f;
-  vpm.m[2][3] = 255 / 2.f;
-  vpm.m[0][0] = tw / 2.f;
-  vpm.m[1][1] = th / 2.f;
-  vpm.m[2][2] = 255 / 2.f;
-  Transform vpt = Transform(vpm);
-  Transform objToWorld = (tMove*tScale) * tproj;
+  Transform viewPort = Viewport(image.width()/8, image.height()/8, image.width() * 3 / 4, image.height() * 3 / 4);
+  Transform modelView = LookAt(Vec3f(1,0.2,1), Vec3f(0,0,0), Vec3f(0,1,0));
+  Transform objToWorld = viewPort*tproj*modelView;
 
   std::cout << objToWorld.ToString();
   for (int i = 0; i < model.nfaces(); i++) {

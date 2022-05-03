@@ -1,6 +1,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#include <limits>
 #ifdef WIN32
 #ifdef CORE_SOURCE
 #define COREDLL __declspec(dllexport)
@@ -15,9 +16,12 @@
 
 #define RAY_EPSILON 1e-3f
 
-#include <math.h>
-#include <cmath>
 #include <assert.h>
+#include <cmath>
+#include <math.h>
+#include <string>
+#include <sstream>
+#include <vector>
 
 #ifdef PBRT_FLOAT_AS_DOUBLE
 typedef double Float;
@@ -25,13 +29,31 @@ typedef double Float;
 typedef float Float;
 #endif // PBRT_FLOAT_AS_DOUBLE
 
+static constexpr Float MaxFloat = std::numeric_limits<Float>::max();
+static constexpr Float Infinity = std::numeric_limits<Float>::infinity();
+
 #include "system/rengen_memory.h"
 
 template <typename T, typename U, typename V>
 inline T Clamp(T val, U low, V high) {
-    if (val < low) return low;
-    else if (val > high) return high;
-    else return val;
+  if (val < low)
+    return low;
+  else if (val > high)
+    return high;
+  else
+    return val;
+}
+
+inline std::vector<std::string> strsplit(const std::string &p_pcstStr, char delim) {
+  std::vector<std::string> tokens;
+  std::stringstream mySstream(p_pcstStr);
+  std::string temp;
+
+  while (getline(mySstream, temp, delim)) {
+    tokens.push_back(temp);
+  }
+
+  return tokens;
 }
 
 #endif
