@@ -32,6 +32,10 @@ typedef float Float;
 static constexpr Float MaxFloat = std::numeric_limits<Float>::max();
 static constexpr Float Infinity = std::numeric_limits<Float>::infinity();
 
+#ifdef __linux__
+#include <memory.h>
+#endif
+
 #include "system/rengen_memory.h"
 
 template <typename T, typename U, typename V>

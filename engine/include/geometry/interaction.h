@@ -4,11 +4,11 @@
 #include "common.h"
 #include "geometry/normal.h"
 #include "geometry/point.h"
-#include "geometry/shape.h"
 #include "geometry/vector.h"
 #include "media/medium.h"
 
 namespace rengen::geometry {
+class Shape;
 
 class Interaction {
 public:
@@ -39,10 +39,9 @@ public:
   rengen::medium::MediumInterface m_mediumInterface;
 };
 
-class SurfaceInteraction : public Interaction {
-  public:
+// class SurfaceInteraction : public Interaction {
 
-};
+// };
 
 class DiffGeo {
 public:

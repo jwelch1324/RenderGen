@@ -3,7 +3,12 @@
 
 #include "common.h"
 #include <memory>
+#ifdef OSX
 #include <malloc/malloc.h>
+#else
+#include <malloc.h>
+#endif
+
 #include <vector>
 
 #ifndef L1_CACHE_LINE_SIZE

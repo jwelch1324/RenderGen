@@ -1,10 +1,13 @@
 #include "core_math.h"
 #include "geometry/geometry.h"
+#include "geometry/normal.h"
 #include "geometry/point.h"
 #include "geometry/ray.h"
+#include "geometry/shapes/sphere.h"
 #include "geometry/vector.h"
 #include "io/ppmimage.h"
 #include "io/tgaimage.h"
+#include "ops/transform.h"
 #include <cstdlib>
 #include <gtest/gtest.h>
 
@@ -37,13 +40,29 @@ Float hitSphere(const geometry::Point3f center, const Float radius,
 }
 const geometry::Vec3f lightVec(0,0,-1);
 
+// io::RGBAColor SphereColor(const geometry::Ray &r) {
+//   geometry::Point3f sphereCenter(0, 0, -1);
+//   Float t = hitSphere(sphereCenter, 0.5, r);
+//   if (t > 0) {
+//     geometry::Vec3f nv = geometry::Vec3f::Normalize(r(t) - sphereCenter);
+//     return io::RGBAColor(0.5 * (nv.x + 1) * 255.99, 0.5 * (nv.y + 1) *
+//     255.99,
+//                          0.5 * (nv.z + 1) * 255.99);
+//   }
+
+//   return TestColor(r);
+// }
+ops::Transform Identity;
+ops::Transform moveSphere = ops::Translate(geometry::Vec3f(0,0,-1));
+ops::Transform moveSphereInv = ops::Translate(geometry::Vec3f(0,0,1));
+
 io::RGBAColor SphereColor(const geometry::Ray &r) {
-  geometry::Point3f sphereCenter(0, 0, -1);
-  Float t = hitSphere(sphereCenter, 0.5, r);
-  if (t > 0) {
-    geometry::Vec3f nv = geometry::Vec3f::Normalize(r(t) - sphereCenter);
-    return io::RGBAColor(0.5 * (nv.x + 1) * 255.99, 0.5 * (nv.y + 1) * 255.99,
-                         0.5 * (nv.z + 1) * 255.99);
+  auto sphere = geometry::shapes::Sphere(0.5, &moveSphere,&moveSphereInv);
+  geometry::Interaction in;
+  Float thit = 0;
+  if (sphere.Intersect(r, &thit, &in)) {
+    auto nn = (geometry::Normal3f::Normalize(in.m_n) + geometry::Normal3f(1, 1, 1)) * 0.5 * 255.99;
+    return io::RGBAColor(nn.x, nn.y, nn.z);
   }
 
   return TestColor(r);
@@ -93,7 +112,7 @@ TEST(SimpleSphereRayTest, BasicAssertions) {
 
   int nx = 2000;
   int ny = 1000;
-  int ns = 100;
+  int ns = 10;
   auto canvas = io::PPMImage(nx, ny);
 
   // Now we scan each pixel and draw a ray from the center of the camera (eye)
