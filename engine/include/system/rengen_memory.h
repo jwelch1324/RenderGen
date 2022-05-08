@@ -3,7 +3,7 @@
 
 #include "common.h"
 #include <memory>
-#ifdef OSX
+#ifdef __APPLE__
 #include <malloc/malloc.h>
 #else
 #include <malloc.h>

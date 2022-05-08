@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(tinyrenderer VERSION 0.1.0)
+project(RenGen VERSION 0.1.0)
 
 
 set(CMAKE_CXX_STANDARD 17)
@@ -20,11 +20,16 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 add_subdirectory("engine")
 
+find_package(SDL2 REQUIRED)
+
 link_directories("/usr/local/lib")
 file(GLOB_RECURSE MAIN_SRC_FILES ${PROJECT_SOURCE_DIR}/src/*.cpp)
-add_executable(tinyrenderer ${MAIN_SRC_FILES})
-target_include_directories(tinyrenderer PRIVATE include engine/include)
-target_link_libraries(tinyrenderer rendergen)
+add_executable(RenGen ${MAIN_SRC_FILES})
+target_include_directories(RenGen PRIVATE include engine/include)
+include_directories(RenGen ${SDL2_INCLUDE_DIRS})
+message(${SDL2_INCLUDE_DIRS})
+target_link_libraries(RenGen rendergen)
+target_link_libraries(RenGen ${SDL2_LIBRARIES})
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

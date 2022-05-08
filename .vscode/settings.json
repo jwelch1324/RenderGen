@@ -1,6 +1,6 @@
 {
     "cmakeExplorer.buildDir": "${buildDirectory}",
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "files.associations": {
         "__bit_reference": "cpp",
         "__bits": "cpp",
@@ -76,5 +76,8 @@
         "memory_resource": "cpp",
         "set": "cpp",
         "variant": "cpp"
-    }
+    },
+    "C_Cpp.default.includePath": [
+        "/usr/local/opt/sdl2/include/SDL2"
+    ]
 }

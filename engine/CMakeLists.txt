@@ -16,10 +16,14 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+
+find_package(SDL2 REQUIRED)
+
 link_directories("/usr/local/lib")
 file(GLOB_RECURSE SRC_FILES ${PROJECT_SOURCE_DIR}/tests *.cpp)
 add_library(rendergen STATIC ${SRC_FILES})
 target_include_directories(rendergen PRIVATE include)
+include_directories(rendergen ${SDL2_INCLUDE_DIRS})
 #target_link_libraries(tinyrenderer profiler)
 
 #add_subdirectory("thirdparty/benchmark")
