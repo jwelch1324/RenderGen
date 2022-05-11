@@ -5,7 +5,6 @@
 #include "geometry/bbox.h"
 #include "geometry/matrix.h"
 #include "geometry/normal.h"
-#include "geometry/normal.h"
 #include "geometry/ray.h"
 
 namespace rengen::ops {
@@ -23,7 +22,23 @@ public:
   Transform(const geometry::Matrix4f &mat, const geometry::Matrix4f &inv)
       : m_mat(mat), m_matInv(inv) {}
 
+  Transform(const Transform &&t) {
+    m_mat = std::move(t.m_mat);
+    m_matInv = std::move(t.m_matInv);
+  }
+
+  Transform &operator=(const Transform &&t) {
+    m_mat = std::move(t.m_mat);
+    m_matInv = std::move(t.m_matInv);
+    return (*this);
+  }
+
   Transform GetInverse() const { return Transform(m_matInv, m_mat); }
+
+  void SetTransform(const Transform &other) {
+    m_mat = geometry::Matrix4f(other.m_mat);
+    m_matInv = geometry::Matrix4f(other.m_matInv);
+  }
 
   // Point Transform operations
   geometry::Point3f operator()(const geometry::Point3f &pt) const;
@@ -65,9 +80,8 @@ public:
     return det < 0.f;
   }
 
-  std::string ToString() const {
-    return m_mat.ToString();
-  }
+  std::string ToString() const { return m_mat.ToString(); }
+
 private:
   geometry::Matrix4f m_mat, m_matInv;
 };
@@ -90,12 +104,12 @@ inline Transform Scale(const geometry::Vec3f &scale) {
   geometry::Matrix4f tMat;
   tMat.m[0][0] = scale.x;
   tMat.m[1][1] = scale.y;
-  tMat.m[2][3] = scale.z;
+  tMat.m[2][2] = scale.z;
 
   geometry::Matrix4f tMatinv;
   tMatinv.m[0][0] = 1.0f / scale.x;
   tMatinv.m[1][1] = 1.0f / scale.y;
-  tMatinv.m[2][3] = 1.0f / scale.z;
+  tMatinv.m[2][2] = 1.0f / scale.z;
 
   return Transform(tMat, tMatinv);
 }
@@ -150,16 +164,16 @@ inline Transform LookAt(const geometry::Vec3f &camera,
 }
 
 inline Transform Viewport(int x, int y, int w, int h, int depth = 255) {
-  //Maps the bi-unit cube [-1,1]x[-1,1]x[-1,1] to [x,x+w]*[y,y+h]*[0,d]
+  // Maps the bi-unit cube [-1,1]x[-1,1]x[-1,1] to [x,x+w]*[y,y+h]*[0,d]
 
   geometry::Matrix4f m;
-  m[0][3] = x+w/2.f;
-  m[1][3] = y+h/2.f;
-  m[2][3] = depth/2.f;
+  m[0][3] = x + w / 2.f;
+  m[1][3] = y + h / 2.f;
+  m[2][3] = depth / 2.f;
 
-  m[0][0] = w/2.f;
-  m[1][1] = h/2.f;
-  m[2][2] = depth/2.f;
+  m[0][0] = w / 2.f;
+  m[1][1] = h / 2.f;
+  m[2][2] = depth / 2.f;
 
   return Transform(m);
 }
@@ -194,6 +208,9 @@ inline Transform Rotate(Float angle, const geometry::Vec3f &axis) {
   Matrix4f tMat(m);
   return Transform(tMat, tMat.Transpose());
 }
+
+Transform &IdentityTransform();
+Transform *IdentityTransformPtr();
 
 } // namespace rengen::ops
 

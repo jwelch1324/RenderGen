@@ -2,6 +2,7 @@
 #define SHAPE_H_
 
 #include "geometry/interaction.h"
+#include "geometry/point.h"
 #include "geometry/ray.h"
 #include "ops/transform.h"
 
@@ -22,6 +23,13 @@ public:
 
   virtual bool Intersect(const Ray &ray, Float *tHit, Interaction *isect,
                          bool testAlphaTexuture = true) const = 0;
+
+  void SetBaseColor(const Point3f &rgbColor) { m_baseColor = rgbColor; }
+  Point3f GetBaseColor() const { return m_baseColor; }
+
+private:
+  Point3f m_baseColor; // The default color to render for the shape when it
+                       // doesn't have a texture
 };
 } // namespace rengen::geometry
 

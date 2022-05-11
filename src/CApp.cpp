@@ -1,11 +1,15 @@
 #include "CApp.h"
 #include "SDL.h"
+#include "SDL_render.h"
 #include "draw/sdlimagecanvas.h"
+#include "geometry/point.h"
+#include "geometry/shapes/sphere.h"
 #include "geometry/vector.h"
 #include "ops/transform.h"
 #include "scene/camera.h"
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 CApp::CApp() : m_isRunning(true), m_pWindow(nullptr), m_pRenderer(nullptr) {}
 
@@ -18,33 +22,32 @@ bool CApp::OnInit() {
 
   m_pWindow =
       SDL_CreateWindow("RenGen", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       1280, 720, SDL_WINDOW_SHOWN);
+                       1980, 1080, SDL_WINDOW_SHOWN);
 
   if (m_pWindow != NULL) {
     m_pRenderer = SDL_CreateRenderer(m_pWindow, -1, 0);
-    m_Canvas.Initialize(1280, 720, m_pRenderer);
+    m_Canvas.Initialize(1980, 1080, m_pRenderer);
 
-    rengen::scene::Camera testCamera;
-    testCamera.SetCameraToWorld(
-        rengen::ops::Translate(rengen::geometry::Vec3f(0, 0, 0)));
+    // Set the background color to white.
+    SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
+    SDL_RenderClear(m_pRenderer);
 
-    testCamera.SetLookAt(rengen::geometry::Vec3f(0.0, 2.0, 0.0));
-    testCamera.SetUp(rengen::geometry::Vec3f(0, 0, 1));
-    testCamera.SetRenderPlaneDistance(1.0);
-    testCamera.SetHorzSize(1.0);
-    testCamera.SetAspect(1.0);
-    testCamera.UpdateCameraGeometry();
+    // // Render the Scene
+    // auto moveMe = rengen::ops::Translate(rengen::geometry::Vec3f(1, 0, 0));
+    // auto other = moveMe.GetInverse();
+    // auto sphere2 = std::make_shared<rengen::geometry::shapes::Sphere>(
+    //     0.5, &moveMe, &other);
+    // sphere2->SetBaseColor(rengen::geometry::Point3f(0, 255, 0));
+    // m_Scene.AddShape(sphere2);
 
-    auto screenCenter = testCamera.GetScreenCenter();
-    auto screenU = testCamera.GetU();
-    auto screenV = testCamera.GetV();
+    // auto sphere = std::make_shared<rengen::geometry::shapes::Sphere>(
+    //     rengen::geometry::shapes::Sphere());
+    // m_Scene.AddShape(sphere);
+    m_Scene.Render(m_Canvas);
+    m_Canvas.Display();
 
-    std::cout << "Camera Screen Centre" << std::endl;
-    PrintVector(rengen::geometry::Vec3f(screenCenter));
-    std::cout << "\nCamera U Vector;" << std::endl;
-    PrintVector(screenU);
-    std::cout << "\nCamera V Vector:" << std::endl;
-    PrintVector(screenV);
+    // Show the result
+    SDL_RenderPresent(m_pRenderer);
 
   } else {
     return false;
@@ -81,17 +84,17 @@ void CApp::OnEvent(SDL_Event *event) {
 void CApp::OnLoop() {}
 
 void CApp::OnRender() {
-  // Set the background color to white.
-  SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
-  SDL_RenderClear(m_pRenderer);
+  //   // Set the background color to white.
+  //   SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);
+  //   SDL_RenderClear(m_pRenderer);
 
-  // Render the Scene
-  m_Scene.Render(m_Canvas);
+  //   // Render the Scene
+  //   m_Scene.Render(m_Canvas);
 
-  m_Canvas.Display();
+  //   m_Canvas.Display();
 
-  // Show the result;
-  SDL_RenderPresent(m_pRenderer);
+  //   // Show the result;
+  //   SDL_RenderPresent(m_pRenderer);
 }
 
 void CApp::OnExit() {

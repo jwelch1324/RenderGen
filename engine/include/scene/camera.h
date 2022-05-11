@@ -18,7 +18,7 @@ public:
   void SetRenderPlaneDistance(const Float newLength);
   void SetHorzSize(const Float newSize);
   void SetAspect(const Float newAspect);
-  void SetCameraToWorld(const ops::Transform &cameraToWorld);
+  void SetCameraToWorld(ops::Transform *cameraToWorld);
 
   // Function to Return Camera Parameters
   geometry::Point3f GetPosition() const { return m_cameraPosition; }
@@ -27,15 +27,15 @@ public:
   geometry::Vec3f GetU() const { return m_projectionScreenU; }
   geometry::Vec3f GetV() const { return m_projectionScreenV; }
   geometry::Point3f GetScreenCenter() const { return m_projectionScreenCenter; }
-  ops::Transform &GetCameraToWorld() { return m_cameraToWorld; }
-  ops::Transform &GetWorldToCamera() { return m_worldToCamera; }
+  ops::Transform *GetCameraToWorld() { return m_cameraToWorld; }
+  ops::Transform *GetWorldToCamera() { return m_worldToCamera; }
 
   Float GetLength() const { return m_cameraLength; }
   Float GetHorzSize() const { return m_cameraHorizontalSize; }
   Float GetAspect() const { return m_cameraAspectRatio; }
 
   // Function to generate a ray
-  geometry::Ray GenerateRay(Float proScreenX, Float proScreenY);
+  bool GenerateRay(Float proScreenX, Float proScreenY, geometry::Ray *outRay);
 
   // Function to update the camera geometry
   void UpdateCameraGeometry();
@@ -53,8 +53,8 @@ private:
   geometry::Vec3f m_projectionScreenV;
   geometry::Point3f m_projectionScreenCenter;
 
-  ops::Transform m_cameraToWorld;
-  ops::Transform m_worldToCamera;
+  ops::Transform *m_cameraToWorld;
+  ops::Transform *m_worldToCamera;
 };
 } // namespace rengen::scene
 

@@ -38,13 +38,13 @@ void Camera::SetAspect(const Float newAspect) {
   m_cameraAspectRatio = newAspect;
 }
 
-void Camera::SetCameraToWorld(const ops::Transform &cameraToWorld) {
+void Camera::SetCameraToWorld(ops::Transform *cameraToWorld) {
   m_cameraToWorld = cameraToWorld;
 }
 
 void Camera::UpdateCameraGeometry() {
 
-  m_cameraPosition = m_cameraToWorld(geometry::Point3f(0, 0, 0));
+  m_cameraPosition = (*m_cameraToWorld)(geometry::Point3f(0, 0, 0));
 
   m_alignmentVector = geometry::Vec3f::Normalize(
       (m_cameraLookAt - geometry::Vec3f(m_cameraPosition)));
@@ -66,7 +66,8 @@ void Camera::UpdateCameraGeometry() {
       m_projectionScreenV * (m_cameraHorizontalSize / m_cameraAspectRatio);
 }
 
-geometry::Ray Camera::GenerateRay(Float proScreenU, Float proScreenV) {
+bool Camera::GenerateRay(Float proScreenU, Float proScreenV,
+                         geometry::Ray *outRay) {
   if (std::abs(proScreenU) > 1)
     proScreenU = proScreenU / std::abs(proScreenU);
 
@@ -80,8 +81,10 @@ geometry::Ray Camera::GenerateRay(Float proScreenU, Float proScreenV) {
   geometry::Point3f screenWorldCoordinate =
       screenWorldPart1 + (m_projectionScreenV * proScreenV);
 
-  return geometry::Ray(m_cameraPosition,
-                       screenWorldCoordinate - m_cameraPosition);
+  outRay->o = m_cameraPosition;
+  outRay->d = screenWorldCoordinate - m_cameraPosition;
+
+  return true;
 }
 
 } // namespace rengen::scene

@@ -8,6 +8,13 @@
 namespace rengen::ops {
 using namespace geometry;
 
+Transform &IdentityTransform() {
+  static Transform IDTRANSFORM = Transform(Matrix4f());
+  return IDTRANSFORM;
+}
+
+Transform *IdentityTransformPtr() { return &(IdentityTransform()); }
+
 Point3f Transform::operator()(const Point3f &pt) const {
   Float x = pt.x;
   Float y = pt.y;

@@ -16,22 +16,24 @@ public:
   Interaction(const Point3f &p, const Normal3f &n, const Vec3f &pError,
               const Vec3f &wo, Float time,
               const medium::MediumInterface &mediumInterface)
-      : m_P(p), m_time(time), m_pError(pError), m_wo(wo), m_n(n),
-        m_mediumInterface(mediumInterface) {}
+      : m_intersectionPoint(p), m_time(time), m_pError(pError), m_wo(wo),
+        m_n(n), m_mediumInterface(mediumInterface) {}
 
   bool IsSurfaceInteraction() const { return m_n != Normal3f(); }
 
   Interaction(const Point3f &p, const Vec3f &wo, Float time,
               const medium::MediumInterface &mediumInterface)
-      : m_P(p), m_time(time), m_wo(wo), m_mediumInterface(mediumInterface) {}
+      : m_intersectionPoint(p), m_time(time), m_wo(wo),
+        m_mediumInterface(mediumInterface) {}
 
   Interaction(const Point3f &p, Float time,
               const medium::MediumInterface &mediumInterface)
-      : m_P(p), m_time(time), m_mediumInterface(mediumInterface) {}
+      : m_intersectionPoint(p), m_time(time),
+        m_mediumInterface(mediumInterface) {}
 
   bool IsMediumInteraction() const { return !IsSurfaceInteraction(); }
 
-  Point3f m_P;
+  Point3f m_intersectionPoint;
   Float m_time;
   Vec3f m_pError;
   Vec3f m_wo;

@@ -19,8 +19,8 @@
 #include <assert.h>
 #include <cmath>
 #include <math.h>
-#include <string>
 #include <sstream>
+#include <string>
 #include <vector>
 
 #ifdef PBRT_FLOAT_AS_DOUBLE
@@ -48,7 +48,8 @@ inline T Clamp(T val, U low, V high) {
     return val;
 }
 
-inline std::vector<std::string> strsplit(const std::string &p_pcstStr, char delim) {
+inline std::vector<std::string> strsplit(const std::string &p_pcstStr,
+                                         char delim) {
   std::vector<std::string> tokens;
   std::stringstream mySstream(p_pcstStr);
   std::string temp;
@@ -58,6 +59,10 @@ inline std::vector<std::string> strsplit(const std::string &p_pcstStr, char deli
   }
 
   return tokens;
+}
+
+template <typename T> inline bool EpislonEqual(T f1, T f2, Float eps = 1e-6) {
+  return (std::abs(f1 - f2) <= eps);
 }
 
 #endif
