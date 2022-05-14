@@ -9,7 +9,7 @@
 namespace rengen::scene {
 Camera::Camera() {
   m_cameraPosition = geometry::Point3f(0, 0, 0);
-  m_cameraLookAt = geometry::Vec3f(0.0, 0.0, 0.0);
+  m_cameraLookAt = geometry::Point3f(0.0, 0.0, 0.0);
   m_cameraUp = geometry::Vec3f(0, 0, 1);
   m_cameraLength = 1.0;
   m_cameraHorizontalSize = 1.0;
@@ -20,7 +20,7 @@ void Camera::SetPosition(const geometry::Point3f &newPosition) {
   m_cameraPosition = newPosition;
 }
 
-void Camera::SetLookAt(const geometry::Vec3f &newLookAt) {
+void Camera::SetLookAt(const geometry::Point3f &newLookAt) {
   m_cameraLookAt = newLookAt;
 }
 
@@ -43,11 +43,10 @@ void Camera::SetCameraToWorld(ops::Transform *cameraToWorld) {
 }
 
 void Camera::UpdateCameraGeometry() {
-
   m_cameraPosition = (*m_cameraToWorld)(geometry::Point3f(0, 0, 0));
 
   m_alignmentVector = geometry::Vec3f::Normalize(
-      (m_cameraLookAt - geometry::Vec3f(m_cameraPosition)));
+      geometry::Vec3f(m_cameraLookAt - geometry::Vec3f(m_cameraPosition)));
 
   // Compute the U and V vectors
   m_projectionScreenU =

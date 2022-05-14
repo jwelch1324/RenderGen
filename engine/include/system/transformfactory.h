@@ -5,8 +5,14 @@
 #include "ops/transform.h"
 #include "system/rengen_memory.h"
 #include "system/singleton.h"
+#include <map>
+#include <string>
 
 namespace rengen::system {
+struct TransformPair {
+  ops::Transform *fwd;
+  ops::Transform *rev;
+};
 
 class TransformFactory : public Singleton<TransformFactory> {
 public:
@@ -21,6 +27,10 @@ public:
                                   ops::Transform **inverse);
 
   ops::Transform *CreateScalingTransform(const geometry::Vec3f &scale);
+  void CreateScalingTransform(const geometry::Vec3f &scale,
+                              ops::Transform **forward,
+                              ops::Transform **inverse);
+
   ops::Transform *CreateRotationTransform(const geometry::Vec3f &angles);
 
   void CreateTranslateScaleTransform(const geometry::Vec3f &delta,
@@ -28,9 +38,13 @@ public:
                                      ops::Transform **forward,
                                      ops::Transform **inverse);
 
+  bool ParseFromString(std::string transformDef, ops::Transform **forward,
+                       ops::Transform **inverse);
+
 private:
   std::vector<ops::Transform *> m_transforms;
   ObjectArena<ops::Transform> m_arena;
+  std::map<std::string, TransformPair> m_storedTransforms;
 };
 
 } // namespace rengen::system

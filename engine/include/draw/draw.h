@@ -356,9 +356,11 @@ void renderHeadTexturedProjective() {
   Float tw = image.width() * 3.f / 4.f;
   Float th = image.height() * 3.f / 4.f;
 
-  Transform viewPort = Viewport(image.width()/8, image.height()/8, image.width() * 3 / 4, image.height() * 3 / 4);
-  Transform modelView = LookAt(Vec3f(1,0.2,1), Vec3f(0,0,0), Vec3f(0,1,0));
-  Transform objToWorld = viewPort*tproj*modelView;
+  Transform viewPort = Viewport(image.width() / 8, image.height() / 8,
+                                image.width() * 3 / 4, image.height() * 3 / 4);
+  Transform modelView =
+      LookAt(Point3f(1, 0.2, 1), Point3f(0, 0, 0), Vec3f(0, 1, 0));
+  Transform objToWorld = viewPort * tproj * modelView;
 
   std::cout << objToWorld.ToString();
   for (int i = 0; i < model.nfaces(); i++) {
@@ -387,8 +389,7 @@ void renderHeadTexturedProjective() {
     zz = Vec3f::Normalize(zz);
 
     //  Get light intensity as scalar product of light vector with normal
-    auto ivec = zz *lightVec;
-
+    auto ivec = zz * lightVec;
 
     if (ivec > 0) {
       draw::texturedTriangle(tri, zbuffer, image, tex, ivec);
@@ -397,5 +398,5 @@ void renderHeadTexturedProjective() {
 
   image.write_tga_file("renderShadedTextureProjective.tga");
 }
-} // namespace draw
+} // namespace rengen::draw
 #endif

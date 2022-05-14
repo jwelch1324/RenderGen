@@ -5,6 +5,7 @@
 #include "geometry/bbox.h"
 #include "geometry/matrix.h"
 #include "geometry/normal.h"
+#include "geometry/point.h"
 #include "geometry/ray.h"
 
 namespace rengen::ops {
@@ -148,8 +149,8 @@ inline Transform RotateZ(const Float theta) {
   return Transform(tMat, tMat.Transpose());
 }
 
-inline Transform LookAt(const geometry::Vec3f &camera,
-                        const geometry::Vec3f &object,
+inline Transform LookAt(const geometry::Point3f &camera,
+                        const geometry::Point3f &object,
                         const geometry::Vec3f &up) {
   using namespace geometry;
   Vec3f normUp = Vec3f::Normalize(up);

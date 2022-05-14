@@ -12,37 +12,43 @@
 #include <memory>
 namespace rengen::scene {
 Scene::Scene() {
-  m_camera.SetCameraToWorld(
-      system::TransformFactory::get_instance().CreateTranslationTransform(
-          geometry::Vec3f(0, -10, 0)));
-  m_camera.SetLookAt(geometry::Vec3f(0, 0, 0));
+  ops::Transform *fwd, *rev;
+  auto &tfactory = system::TransformFactory::get_instance();
+  tfactory.ParseFromString("T 0 -10 0", &fwd, &rev);
+
+  m_camera.SetCameraToWorld(fwd);
+  m_camera.SetLookAt(geometry::Point3f(0, 0, 0));
   m_camera.SetUp(geometry::Vec3f(0, 0, 1));
   m_camera.SetHorzSize(0.25);
   m_camera.SetAspect(16.0 / 9.0);
   m_camera.UpdateCameraGeometry();
-  ops::Transform *fwd, *rev;
 
-  auto &tfactory = system::TransformFactory::get_instance();
-  tfactory.CreateTranslationTransform(geometry::Vec3f(0, 0, 0), &fwd, &rev);
+  tfactory.ParseFromString("U -1.5 0.0 0.0 0.5 0.5 0.75", &fwd, &rev);
 
   // Construct a test sphere
   m_shapes.push_back(std::make_shared<geometry::shapes::Sphere>(
       geometry::shapes::Sphere(1.0, fwd, rev)));
 
-  fwd = rev = nullptr;
+  // fwd = rev = nullptr;
 
-  tfactory.CreateTranslateScaleTransform(
-      geometry::Vec3f(-1.0, 0, 0), geometry::Vec3f(0.5, 1, 1), &fwd, &rev);
+  tfactory.ParseFromString("S 0.75 .5 .5", &fwd, &rev);
   m_shapes.push_back(std::make_shared<geometry::shapes::Sphere>(
       geometry::shapes::Sphere(1.0, fwd, rev)));
-  m_shapes.at(1)->SetBaseColor(geometry::Point3f(255, 255, 125));
-  //   m_shapes.push_back(
-  //       std::make_shared<geometry::shapes::Sphere>(geometry::shapes::Sphere()));
+
+  // fwd = rev = nullptr;
+
+  tfactory.ParseFromString("U 1.5 0.0 0.0 0.75 .75 0.75", &fwd, &rev);
+  m_shapes.push_back(std::make_shared<geometry::shapes::Sphere>(
+      geometry::shapes::Sphere(1.0, fwd, rev)));
+
+  m_shapes.at(0)->SetBaseColor(geometry::Point3f(64.0, 128, 200));
+  m_shapes.at(1)->SetBaseColor(geometry::Point3f(255, 128, 0.0));
+  m_shapes.at(2)->SetBaseColor(geometry::Point3f(255, 200, 0));
 
   // Construct a test light
   m_lights.push_back(
       std::make_shared<lights::PointLight>(lights::PointLight()));
-  m_lights.at(0)->m_position = geometry::Point3f(5, -10.0, -5.0);
+  m_lights.at(0)->m_position = geometry::Point3f(5.0, -10.0, -5.0);
   m_lights.at(0)->m_color = geometry::Point3f(255, 255, 255);
   m_lights.at(0)->m_intensity = 1;
 }

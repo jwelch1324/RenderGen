@@ -22,11 +22,11 @@ bool CApp::OnInit() {
 
   m_pWindow =
       SDL_CreateWindow("RenGen", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       1980, 1080, SDL_WINDOW_SHOWN);
+                       1280, 720, SDL_WINDOW_SHOWN);
 
   if (m_pWindow != NULL) {
     m_pRenderer = SDL_CreateRenderer(m_pWindow, -1, 0);
-    m_Canvas.Initialize(1980, 1080, m_pRenderer);
+    m_Canvas.Initialize(1280, 720, m_pRenderer);
 
     // Set the background color to white.
     SDL_SetRenderDrawColor(m_pRenderer, 255, 255, 255, 255);

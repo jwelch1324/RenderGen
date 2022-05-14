@@ -13,7 +13,7 @@ public:
 
   // Functions to set camera parameters
   void SetPosition(const geometry::Point3f &newPosition);
-  void SetLookAt(const geometry::Vec3f &newLookAt);
+  void SetLookAt(const geometry::Point3f &newLookAt);
   void SetUp(const geometry::Vec3f &upVector);
   void SetRenderPlaneDistance(const Float newLength);
   void SetHorzSize(const Float newSize);
@@ -22,7 +22,7 @@ public:
 
   // Function to Return Camera Parameters
   geometry::Point3f GetPosition() const { return m_cameraPosition; }
-  geometry::Vec3f GetLookAt() const { return m_cameraLookAt; }
+  geometry::Point3f GetLookAt() const { return m_cameraLookAt; }
   geometry::Vec3f GetUp() const { return m_cameraUp; }
   geometry::Vec3f GetU() const { return m_projectionScreenU; }
   geometry::Vec3f GetV() const { return m_projectionScreenV; }
@@ -42,7 +42,7 @@ public:
 
 private:
   geometry::Point3f m_cameraPosition;
-  geometry::Vec3f m_cameraLookAt;
+  geometry::Point3f m_cameraLookAt;
   geometry::Vec3f m_cameraUp;
   Float m_cameraLength;
   Float m_cameraHorizontalSize;

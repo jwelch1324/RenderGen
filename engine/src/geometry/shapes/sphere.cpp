@@ -48,7 +48,7 @@ bool Sphere::Intersect(const Ray &castRay, Float *tHit, Interaction *isect,
   isect->m_intersectionPoint = (*m_ObjectToWorld)(ray(*tHit));
   isect->m_time = *tHit;
   isect->m_n = Normal3f(
-      Vec3f(isect->m_intersectionPoint - (*m_ObjectToWorld)(Vec3f(0, 0, 0))));
+      Vec3f(isect->m_intersectionPoint - (*m_ObjectToWorld)(Point3f(0, 0, 0))));
   if (isect->m_n == Normal3f(0, 0, 0))
     printf("Hmm...\n");
   return true;
