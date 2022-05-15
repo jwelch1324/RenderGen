@@ -32,25 +32,30 @@ bool Sphere::Intersect(const Ray &castRay, Float *tHit, Interaction *isect,
   Float r1 = (-b + sqrtD) / (2.0 * a);
   Float r2 = (-b - sqrtD) / (2.0 * a);
 
-  if ((r1 <= 0.0) || (r2 <= 0.0)) {
+  if ((r1 < 0.0) || (r2 < 0.0)) {
     // Some part of the object is behind the camera so we ignore it
     return false;
   }
 
   // Determine which point of intersection was closest to the camera
-  if (r1 < r2)
-    *tHit = r1;
-  else
-    *tHit = r2;
+  if (tHit != nullptr) {
+    if (r1 < r2)
+      *tHit = r1;
+    else
+      *tHit = r2;
 
-  Point3f intP = ray(*tHit);
-  auto f = (*m_ObjectToWorld)(intP - Vec3f(0, 0, 0));
-  isect->m_intersectionPoint = (*m_ObjectToWorld)(ray(*tHit));
-  isect->m_time = *tHit;
-  isect->m_n = Normal3f(
-      Vec3f(isect->m_intersectionPoint - (*m_ObjectToWorld)(Point3f(0, 0, 0))));
-  if (isect->m_n == Normal3f(0, 0, 0))
-    printf("Hmm...\n");
+    if (isect != nullptr) {
+      isect->m_intersectionPoint = (*m_ObjectToWorld)(ray(*tHit));
+      isect->m_time = *tHit;
+      isect->m_n = Normal3f(Vec3f(isect->m_intersectionPoint -
+                                  (*m_ObjectToWorld)(Point3f(0, 0, 0))));
+
+      if (isect->m_n == Normal3f(0, 0, 0))
+        printf("Hmm...\n");
+
+      isect->m_color = GetBaseColor();
+    }
+  }
   return true;
 }
 

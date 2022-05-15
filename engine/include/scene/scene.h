@@ -9,8 +9,13 @@
 #include <memory>
 #include <vector>
 
-namespace rengen::scene {
+// Forward Declare Renderers So we can make friends of the class
+namespace rengen::system::render {
+class RenderSubSystem;
+class SerialRenderer;
+} // namespace rengen::system::render
 
+namespace rengen::scene {
 class Scene {
 public:
   // Default constructor
@@ -21,7 +26,8 @@ public:
   void AddShape(std::shared_ptr<geometry::Shape> shape) {
     m_shapes.push_back(shape);
   }
-
+  friend class system::render::RenderSubSystem;
+  friend class system::render::SerialRenderer;
   // Private functions
 private:
   // Private Members

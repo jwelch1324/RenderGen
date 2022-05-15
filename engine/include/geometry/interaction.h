@@ -38,6 +38,7 @@ public:
   Vec3f m_pError;
   Vec3f m_wo;
   Normal3f m_n;
+  Point3f m_color;
   rengen::medium::MediumInterface m_mediumInterface;
 };
 

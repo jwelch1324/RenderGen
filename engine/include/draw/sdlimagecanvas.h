@@ -1,6 +1,7 @@
 #ifndef QBIMG_H_
 #define QBIMG_H_
 
+#include "common.h"
 #include "io/tgaimage.h"
 #include <SDL.h>
 #include <string>
@@ -29,6 +30,7 @@ public:
 private:
   Uint32 ConvertColor(const double red, const double green, const double blue);
   void InitTexture();
+  void ComputeMaxValues();
 
 private:
   // Arrays to store image data
@@ -40,6 +42,8 @@ private:
   int m_xSize, m_ySize;
   SDL_Renderer *m_pRenderer;
   SDL_Texture *m_pTexture;
+
+  Float m_maxRed, m_maxGreen, m_maxBlue, m_overallMax;
 };
 } // namespace rengen::draw
 

@@ -72,6 +72,14 @@ public:
   }
 };
 
+class RGBColor : public Point<Float> {
+public:
+  RGBColor(Float r = 0, Float g = 0, Float b = 0) : Point<Float>(r, g, b) {}
+  Float &r() { return x; }
+  Float &g() { return y; }
+  Float &b() { return z; }
+};
+
 typedef Point<Float> Point3f;
 typedef Point<Float> P3f;
 typedef Point<int> P3i;

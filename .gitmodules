@@ -1,3 +1,6 @@
 [submodule "thirdparty/benchmark"]
 	path = thirdparty/benchmark
 	url = https://github.com/google/benchmark.git
+[submodule "thirdparty/actor-framework"]
+	path = thirdparty/actor-framework
+	url = https://github.com/actor-framework/actor-framework
