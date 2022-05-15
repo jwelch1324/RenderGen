@@ -6,8 +6,8 @@
 namespace rengen::system::render {
 class SerialRenderer : public RenderSubSystem {
 public:
-  SerialRenderer() {}
-  virtual ~SerialRenderer() {}
+  SerialRenderer();
+  virtual ~SerialRenderer();
 
   geometry::RGBColor RenderRay(geometry::Ray &ray) const override;
 };

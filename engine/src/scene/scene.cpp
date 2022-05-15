@@ -10,6 +10,8 @@
 #include "scene/camera.h"
 #include "scene/light.h"
 #include "scene/lights/pointlight.h"
+#include "system/render_subsystem/render_subsystem.h"
+#include "system/render_subsystem/serial_subsystem.h"
 #include "system/transformfactory.h"
 #include <cstdlib>
 #include <iostream>
@@ -108,70 +110,11 @@ bool Scene::Render(draw::SDLImageCanvas &outputImage) {
 
         // Generate a ray for this pixel
         m_camera.GenerateRay(normX, normY, &cameraRay);
-
-        std::shared_ptr<geometry::Shape> closestObject;
-        geometry::Point3f closestIntPoint;
-        geometry::Normal3f closestLocalNormal;
-        geometry::Point3f closestLocalColor;
-        Float minDist = 1e6;
-        bool intersectionFound = false;
-
-        // Test for Intersections with all objects in the scene.
-        bool validInt = false;
-        for (auto currentObject : m_shapes) {
-          validInt = currentObject->Intersect(cameraRay, &tHit, &interStruct);
-          if (validInt) {
-            // Set the flag to indicate that we found an intersection
-            intersectionFound = true;
-
-            // Compute the distance between the camera and point of intersection
-            Float dist = (interStruct.m_intersectionPoint - cameraRay.o).norm();
-
-            // If this object is closer to the camera than any other that we
-            // have seen before then store a ref to it
-            if (dist < minDist) {
-              minDist = dist;
-              closestObject = currentObject;
-              closestIntPoint = interStruct.m_intersectionPoint;
-              closestLocalNormal = interStruct.m_n;
-              closestLocalColor = interStruct.m_color;
-            }
-          }
-        }
-
-        // Compute illumination for closest object, assuming that there was one
-        // found
-        if (intersectionFound) {
-          // Compute intensity
-          Float intensity = 0.0;
-          geometry::Point3f color;
-          Float red = 0.0;
-          Float green = 0.0;
-          Float blue = 0.0;
-          bool validIllum = false;
-          bool illumnFound = false;
-          for (auto currentLight : m_lights) {
-            validIllum = currentLight->ComputeIllumination(
-                closestIntPoint, closestLocalNormal, m_shapes, closestObject,
-                color, intensity);
-
-            if (validIllum) {
-              illumnFound = true;
-              red += color.x * intensity;
-              green += color.y * intensity;
-              blue += color.z * intensity;
-            }
-          }
-
-          if (illumnFound) {
-            red *= closestLocalColor.x;
-            green *= closestLocalColor.y;
-            blue *= closestLocalColor.z;
-
-            rtotal += red;
-            gtotal += green;
-            btotal += blue;
-          }
+        if (m_renderSystem != nullptr) {
+          geometry::RGBColor c = m_renderSystem->RenderRay(cameraRay);
+          rtotal += c.r();
+          gtotal += c.g();
+          btotal += c.b();
         }
       }
       outputImage.SetPixel(x, y, rtotal / ns, gtotal / ns, btotal / ns);

@@ -15,10 +15,9 @@ namespace rengen::system::render {
 
 class RenderSubSystem {
 public:
-  RenderSubSystem();
-  virtual ~RenderSubSystem();
+  RenderSubSystem() {}
 
-  virtual geometry::RGBColor RenderRay(geometry::Ray &ray) const;
+  virtual geometry::RGBColor RenderRay(geometry::Ray &ray) const = 0;
   void SetScene(scene::Scene &sceneIn) { m_sceneReference = sceneIn; }
 
 protected:

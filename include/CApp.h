@@ -32,6 +32,7 @@ private:
   bool m_isRunning;
   SDL_Window *m_pWindow;
   SDL_Renderer *m_pRenderer;
+  rengen::system::render::RenderSubSystem *m_pRenderSubsystem;
 };
 
 #endif

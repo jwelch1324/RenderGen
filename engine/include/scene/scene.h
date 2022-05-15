@@ -23,6 +23,9 @@ public:
 
   // Function to perform the actual rendering.
   bool Render(draw::SDLImageCanvas &outputImage);
+  void SetRenderSubSystem(system::render::RenderSubSystem *subsystem) {
+    m_renderSystem = subsystem;
+  }
   void AddShape(std::shared_ptr<geometry::Shape> shape) {
     m_shapes.push_back(shape);
   }
@@ -35,6 +38,7 @@ private:
   Camera m_camera;
   std::vector<std::shared_ptr<geometry::Shape>> m_shapes;
   std::vector<std::shared_ptr<Light>> m_lights;
+  system::render::RenderSubSystem *m_renderSystem;
 };
 
 } // namespace rengen::scene

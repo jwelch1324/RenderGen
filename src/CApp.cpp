@@ -7,6 +7,8 @@
 #include "geometry/vector.h"
 #include "ops/transform.h"
 #include "scene/camera.h"
+#include "scene/scene.h"
+#include "system/render_subsystem/serial_subsystem.h"
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -43,6 +45,8 @@ bool CApp::OnInit() {
     // auto sphere = std::make_shared<rengen::geometry::shapes::Sphere>(
     //     rengen::geometry::shapes::Sphere());
     // m_Scene.AddShape(sphere);
+    m_pRenderSubsystem = new rengen::system::render::SerialRenderer();
+    m_Scene.SetRenderSubSystem(m_pRenderSubsystem);
     m_Scene.Render(m_Canvas);
     m_Canvas.Display();
 

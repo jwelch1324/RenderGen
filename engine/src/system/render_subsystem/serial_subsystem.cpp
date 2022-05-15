@@ -3,6 +3,9 @@
 #include "geometry/point.h"
 
 namespace rengen::system::render {
+SerialRenderer::~SerialRenderer() {}
+SerialRenderer::SerialRenderer() {}
+
 geometry::RGBColor SerialRenderer::RenderRay(geometry::Ray &cameraRay) const {
   std::shared_ptr<geometry::Shape> closestObject;
   geometry::Point3f closestIntPoint;
